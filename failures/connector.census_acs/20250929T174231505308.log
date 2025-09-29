@@ -1,0 +1,7 @@
+{
+  "timestamp": "20250929T174231505308",
+  "source_id": "connector.census_acs",
+  "correlation_id": "dfde2cfb2e124f078c352eaa6106212e",
+  "message": "Connector 'connector.census_acs' failed [context: source_id='connector.census_acs', error=\"name '_to_float' is not defined\"]",
+  "cache_key": "c06244cb5799d66d710ac4d5a52cfa1dd385c63ada510f2bcefea66b36adacdc"
+}

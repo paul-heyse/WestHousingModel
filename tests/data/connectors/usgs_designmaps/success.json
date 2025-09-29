@@ -1,0 +1,9 @@
+[
+  {
+    "lat": 39.7392,
+    "lon": -104.9903,
+    "pga_10in50_g": 0.18,
+    "observed_at": "2025-02-01",
+    "source_id": "connector.usgs_designmaps"
+  }
+]

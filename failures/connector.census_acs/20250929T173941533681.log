@@ -1,0 +1,9 @@
+{
+  "timestamp": "20250929T173941533681",
+  "source_id": "connector.census_acs",
+  "correlation_id": "f749c36417f4481ab24791ad6d0d22b6",
+  "message": "ACS payload missing tract identifiers [context: source_id='connector.census_acs', record={'unexpected': 1}]",
+  "cache_key": "44077c66abc708178012ceb0310d48f74d4f74bb53fa2248c9e1defbed23123a",
+  "query_signature": "{}",
+  "error": "ACS payload missing tract identifiers"
+}

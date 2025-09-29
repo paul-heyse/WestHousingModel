@@ -14,5 +14,3 @@ def format_tooltip(label: str, provenance: Mapping[str, Any] | None) -> str:
 
 
 __all__ = ["format_tooltip"]
-
-

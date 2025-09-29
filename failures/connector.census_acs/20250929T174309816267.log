@@ -1,0 +1,7 @@
+{
+  "timestamp": "20250929T174309816267",
+  "source_id": "connector.census_acs",
+  "correlation_id": "e96f2867b3714e18a7797546f1e90fc8",
+  "message": "Connector 'connector.census_acs' failed [context: source_id='connector.census_acs', error='list.copy() takes no keyword arguments']",
+  "cache_key": "c06244cb5799d66d710ac4d5a52cfa1dd385c63ada510f2bcefea66b36adacdc"
+}

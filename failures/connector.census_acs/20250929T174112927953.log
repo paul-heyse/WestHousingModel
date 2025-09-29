@@ -1,0 +1,7 @@
+{
+  "timestamp": "20250929T174112927953",
+  "source_id": "connector.census_acs",
+  "correlation_id": "0bbd75a64e7b403790ddaea4fa9ff1b9",
+  "message": "Connector 'connector.census_acs' failed [context: source_id='connector.census_acs', error='list indices must be integers or slices, not str']",
+  "cache_key": "c06244cb5799d66d710ac4d5a52cfa1dd385c63ada510f2bcefea66b36adacdc"
+}

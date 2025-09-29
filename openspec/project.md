@@ -81,6 +81,8 @@ It is designed for a two-person team, runs on a laptop, and outputs IC-ready one
 
 ## External Dependencies
 
+### Source Registry Summary
+
 *(from sources registry, distilled into major classes)*
 
 - **Market & Population**: BLS CES/LAUS; Census ACS; Census Building Permits Survey

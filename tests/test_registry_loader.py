@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import pytest
+
 from west_housing_model.config import load_data_dictionary, load_registry
 from west_housing_model.core.exceptions import RegistryError
 

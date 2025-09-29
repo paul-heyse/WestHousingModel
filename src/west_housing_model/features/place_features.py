@@ -133,6 +133,8 @@ def assemble_place_features(
 
     # Start with required base columns
     combined = base[["place_id", "geo_level", "geo_code", "name", "source_id"]].copy(deep=True)
+    if "geo_code" in combined.columns:
+        combined["geo_code"] = combined["geo_code"].astype(str)
     # Pass through context components if present
     for passthrough in ("public_land_acres_30min", "broadband_gbps_flag"):
         if passthrough in base.columns:

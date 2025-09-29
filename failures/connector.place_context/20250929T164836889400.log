@@ -1,0 +1,7 @@
+{
+  "timestamp": "20250929T164836889400",
+  "source_id": "connector.place_context",
+  "correlation_id": "7ca701f1cd5d48498f04c5a709467887",
+  "message": "Connector 'connector.place_context' failed [context: source_id='connector.place_context', error='boom']",
+  "cache_key": "2a534c5090f00739c270b4b224ddedd5ffb9e776efbd48e99fad639b9c09644f"
+}

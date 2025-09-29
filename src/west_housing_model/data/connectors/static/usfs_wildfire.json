@@ -1,0 +1,12 @@
+[
+  {
+    "geo_id": "08005012602",
+    "wildfire_risk_percentile": 82,
+    "observed_at": "2025-02-01"
+  },
+  {
+    "geo_id": "08005",
+    "wildfire_risk_percentile": 75,
+    "observed_at": "2025-02-01"
+  }
+]

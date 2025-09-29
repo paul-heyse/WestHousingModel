@@ -8,6 +8,8 @@ dependencies = [
     "pandas>=2.1",
     "pandera>=0.17",
     "pyarrow>=14.0",
+    "requests>=2.32",
+    "vcrpy>=5.1",
 ]
 
 [project.scripts]
@@ -25,7 +27,17 @@ extend-select = ["I"]
 
 [tool.mypy]
 python_version = "3.12"
-strict = true
+warn_unused_configs = true
+warn_return_any = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+no_implicit_optional = true
+strict_equality = true
+explicit_package_bases = true
+show_error_codes = true
+pretty = true
+color_output = true
+disable_error_code = ["import-untyped"]
 
 [[tool.mypy.overrides]]
 module = [
@@ -35,12 +47,39 @@ module = [
 ]
 ignore_missing_imports = true
 
+[[tool.mypy.overrides]]
+module = [
+    "pandera",
+    "pandera.*",
+    "streamlit",
+    "streamlit.*",
+]
+ignore_missing_imports = true
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-pythonpath = ["src"]
+pythonpath = ["src", "."]
+markers = [
+    "performance: Performance smoke tests that assert runtime thresholds",
+]
 
 [[tool.mypy.overrides]]
 module = [
-    "west_housing_model.*",
+    "west_housing_model.data.*",
+    "west_housing_model.features.*",
+    "west_housing_model.valuation.*",
+    "west_housing_model.cli.*",
 ]
-ignore_missing_imports = true
+strict = true
+
+[[tool.mypy.overrides]]
+module = [
+    "west_housing_model.ui.*",
+]
+disallow_untyped_decorators = false
+
+[[tool.mypy.overrides]]
+module = [
+    "tests.*",
+]
+strict = false

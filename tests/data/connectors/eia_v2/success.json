@@ -1,0 +1,8 @@
+[
+  {
+    "state": "CO",
+    "res_price_cents_per_kwh": 13.2,
+    "observed_at": "2025-02-01",
+    "source_id": "connector.eia_v2"
+  }
+]

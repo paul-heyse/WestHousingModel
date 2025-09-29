@@ -4,7 +4,7 @@ from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Mapping, MutableMapping, Sequence
 
-import yaml  # type: ignore[import-untyped]
+import yaml
 
 from west_housing_model.core.exceptions import RegistryError
 

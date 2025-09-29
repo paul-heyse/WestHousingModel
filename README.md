@@ -11,7 +11,7 @@ Baseline template for Python projects in Cursor on Ubuntu.
 
 See `.cursor/rules`, `.vscode/*`, and `environment.yml` for configuration details.
 
-## Testing
+# Testing
 
 ```bash
 # Run unit + integration tests
@@ -50,6 +50,14 @@ Pages:
 - Example: `west-housing-model refresh connector.census_acs --param state=08 --param county=005`
 - Structured logging: JSON logs with correlation IDs go to stderr by default; configure via `WEST_HOUSING_LOG_LEVEL` and `WEST_HOUSING_LOG_FORMAT` (`json|text`).
 
+## Testing
+
+- Core commands: `pytest -q`, `ruff check tests`, `black tests`.
+- Coverage snapshot: `pytest --cov=west_housing_model --cov-report=term-missing`.
+- Layered coverage: unit (connectors/logging), integration (CLI/cache flows), and golden scenarios (feature + valuation snapshots). See `tests/README.md` for the matrix and fixture guides.
+- Use the shared factories in `tests/factories.py` to build canonical datasets and keep expectations consistent across suites.
+- Performance: `pytest -m performance` runs the smoke test and fails if the end-to-end pipeline exceeds the threshold (override with `PERF_SMOKE_THRESHOLD`).
+
 ## Scoring Weights (Environment Overrides)
 
 The app exposes scoring weights via environment variables. Defaults are sensible and normalized to sum to 1.0.
@@ -70,7 +78,7 @@ Notes:
 - Weights are normalized at runtime if they don’t sum to 1.0.
 - Leave variables unset to use defaults. You can set them in your shell or via `.env`/direnv.
 
-## Governance
+# Governance
 
 - Feature Dictionary: see `docs/feature_dictionary.md` for columns, sources, units, and provenance.
 - Rulebook: see `docs/rulebook.md` for scoring and valuation formulas, thresholds, and override policy.

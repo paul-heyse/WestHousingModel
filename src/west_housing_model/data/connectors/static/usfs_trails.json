@@ -1,0 +1,12 @@
+[
+  {
+    "place_id": "denver",
+    "minutes_to_trailhead": 18.0,
+    "observed_at": "2025-02-01"
+  },
+  {
+    "place_id": "boise",
+    "minutes_to_trailhead": 22.0,
+    "observed_at": "2025-02-01"
+  }
+]

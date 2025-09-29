@@ -1,0 +1,12 @@
+[
+  {
+    "geo_id": "08005012602",
+    "broadband_gbps_flag": true,
+    "observed_at": "2025-02-01"
+  },
+  {
+    "geo_id": "16001020100",
+    "broadband_gbps_flag": false,
+    "observed_at": "2025-02-01"
+  }
+]

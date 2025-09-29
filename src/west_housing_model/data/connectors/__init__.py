@@ -8,11 +8,45 @@ import pandas as pd
 
 from west_housing_model.core.exceptions import ConnectorError, SchemaError
 from west_housing_model.data.catalog import failure_capture_path, validate_connector
+from west_housing_model.data.connectors.census_acs import (
+    CensusAcsConfig,
+    fetch_census_acs,
+)
+from west_housing_model.data.connectors.eia_v2 import EIAConfig, fetch_eia_rates
+from west_housing_model.data.connectors.fcc_bdc import FCCBDCConfig, fetch_fcc_broadband
+from west_housing_model.data.connectors.hud_fmr import HUDFMRConfig, fetch_hud_fmr
+from west_housing_model.data.connectors.pad_us import PadUSConfig, fetch_pad_us
+from west_housing_model.data.connectors.storm_events import fetch_storm_events
+from west_housing_model.data.connectors.usfs_trails import (
+    USFSTrailsConfig,
+    fetch_usfs_trails,
+)
+from west_housing_model.data.connectors.usfs_wildfire import (
+    USFSWildfireConfig,
+    fetch_usfs_wildfire,
+)
+from west_housing_model.data.connectors.usgs_designmaps import (
+    USGSDesignMapsConfig,
+    fetch_usgs_designmaps,
+)
+from west_housing_model.data.connectors.usgs_epqs import (
+    USGSEPQSConfig,
+    fetch_usgs_epqs,
+)
+from west_housing_model.data.connectors.usgs_epqs import (
+    USGSEPQSConfig,
+    fetch_usgs_epqs,
+)
+STATE_FIPS_TO_ABBR = {
+    '08': 'CO',
+    '16': 'ID',
+    '49': 'UT',
+}
 
 
 @dataclass
 class DataConnector:
-    """Simple connector wrapper that enforces schema validation."""
+    """Connector wrapper that enforces schema validation."""
 
     source_id: str
     fetch_func: Callable[..., pd.DataFrame]
@@ -63,48 +97,62 @@ def register_connector(conn: DataConnector) -> None:
     DEFAULT_CONNECTORS[conn.source_id] = conn
 
 
-def _to_float(value: object, default: float = 0.0) -> float:
-    try:
-        return float(value)  # type: ignore[arg-type]
-    except (TypeError, ValueError):
-        return default
-
 
 def make_census_acs_connector(
     *,
     year: int = 2023,
     geo_level: str = "tract",
     ttl_seconds: int = 400 * 86_400,
-    fetch_override: Callable[..., list[dict[str, object]]] | None = None,
+    config: CensusAcsConfig | None = None,
+    fetch_override: Callable[..., pd.DataFrame] | None = None,
 ) -> DataConnector:
     source_id = "connector.census_acs"
+    cfg = config or CensusAcsConfig()
 
-    def _fetch(**_: object) -> pd.DataFrame:
-        payload = (
-            fetch_override(**_)
+    def _fetch(state: str, county: str, tract: str | None = None, table: str = cfg.table, **_: Any) -> pd.DataFrame:
+        raw = (
+            fetch_override(state=state, county=county, tract=tract, table=table)
             if fetch_override is not None
-            else [
-                {
-                    "NAME": "Test",
-                    "state": "08",
-                    "county": "005",
-                    "tract": "001202",
-                    "B19013_001E": "75000",
-                }
-            ]
-        )
-        rows = []
-        for rec in payload:
-            rows.append(
-                {
-                    "geo_id": f"{rec.get('state')}{rec.get('county')}{rec.get('tract')}",
-                    "geo_level": geo_level,
-                    "median_household_income": _to_float(rec.get("B19013_001E", 0), 0.0),
-                    "observed_at": pd.Timestamp(f"{year}-12-31"),
-                    "source_id": source_id,
-                }
+            else fetch_census_acs(
+                state=state,
+                county=county,
+                tract=tract,
+                table=table,
+                config=CensusAcsConfig(dataset=cfg.dataset, table=table, base_url=cfg.base_url),
             )
-        return pd.DataFrame(rows)
+        )
+        frame = pd.DataFrame(raw).copy(deep=True)
+        if frame.empty:
+            raise SchemaError(
+                "ACS connector produced empty frame",
+                context={"source_id": source_id},
+            )
+        if "geo_id" not in frame.columns:
+            required = {"state", "county", "tract"}
+            if not required.issubset(frame.columns):
+                raise SchemaError(
+                    "ACS payload missing identifiers",
+                    context={"missing": sorted(required - set(frame.columns))},
+                )
+            frame["geo_id"] = (
+                frame["state"].astype(str)
+                + frame["county"].astype(str)
+                + frame["tract"].astype(str)
+            )
+        if "median_household_income" not in frame.columns:
+            if table not in frame.columns:
+                raise SchemaError(
+                    "ACS payload missing income column",
+                    context={"table": table},
+                )
+            frame["median_household_income"] = pd.to_numeric(frame[table], errors="coerce")
+        frame["median_household_income"] = frame["median_household_income"].astype(float)
+        if "geo_level" not in frame.columns:
+            frame["geo_level"] = geo_level
+        observed = frame["observed_at"] if "observed_at" in frame.columns else pd.Timestamp(f"{year}-12-31")
+        frame["observed_at"] = pd.to_datetime(observed)
+        frame["source_id"] = source_id
+        return frame
 
     conn = callable_connector(source_id, _fetch, ttl_seconds=ttl_seconds)
     conn.schema_version = "1"
@@ -112,35 +160,19 @@ def make_census_acs_connector(
     return conn
 
 
-# Register the default census connector on import so tests observe it.
-make_census_acs_connector()
-
-
-def _observed_at(default: datetime | None = None) -> pd.Timestamp:
-    return pd.Timestamp(default or datetime.now(timezone.utc))
-
-
 def make_usfs_wildfire_connector(
     *,
     ttl_seconds: int = 365 * 86_400,
-    fetch_override: Callable[..., list[dict[str, object]]] | None = None,
+    config: USFSWildfireConfig | None = None,
+    fetch_override: Callable[..., pd.DataFrame] | None = None,
 ) -> DataConnector:
     source_id = "connector.usfs_wildfire"
+    cfg = config or USFSWildfireConfig()
 
-    def _fetch(geo_id: str, **extras: object) -> pd.DataFrame:
-        payload = (
-            fetch_override(geo_id=geo_id, **extras)
-            if fetch_override
-            else [
-                {
-                    "geo_id": geo_id,
-                    "wildfire_risk_percentile": 75,
-                    "observed_at": _observed_at(),
-                    "source_id": source_id,
-                }
-            ]
-        )
-        return pd.DataFrame(payload)
+    def _fetch(geo_id: str, **extras: Any) -> pd.DataFrame:
+        if fetch_override is not None:
+            return fetch_override(geo_id=geo_id, **extras)
+        return fetch_usfs_wildfire(geo_id=geo_id, config=cfg)
 
     conn = callable_connector(source_id, _fetch, ttl_seconds=ttl_seconds)
     conn.schema_version = "1"
@@ -151,25 +183,16 @@ def make_usfs_wildfire_connector(
 def make_usgs_designmaps_connector(
     *,
     ttl_seconds: int = 365 * 86_400,
-    fetch_override: Callable[..., list[dict[str, object]]] | None = None,
+    config: USGSDesignMapsConfig | None = None,
+    fetch_override: Callable[..., pd.DataFrame] | None = None,
 ) -> DataConnector:
     source_id = "connector.usgs_designmaps"
+    cfg = config or USGSDesignMapsConfig()
 
-    def _fetch(lat: float, lon: float, **extras: object) -> pd.DataFrame:
-        payload = (
-            fetch_override(lat=lat, lon=lon, **extras)
-            if fetch_override
-            else [
-                {
-                    "lat": lat,
-                    "lon": lon,
-                    "pga_10in50_g": 0.15,
-                    "observed_at": _observed_at(),
-                    "source_id": source_id,
-                }
-            ]
-        )
-        return pd.DataFrame(payload)
+    def _fetch(lat: float, lon: float, **extras: Any) -> pd.DataFrame:
+        if fetch_override is not None:
+            return fetch_override(lat=lat, lon=lon, **extras)
+        return fetch_usgs_designmaps(lat=lat, lon=lon, config=cfg)
 
     conn = callable_connector(source_id, _fetch, ttl_seconds=ttl_seconds)
     conn.schema_version = "1"
@@ -180,24 +203,24 @@ def make_usgs_designmaps_connector(
 def make_noaa_storm_events_connector(
     *,
     ttl_seconds: int = 180 * 86_400,
-    fetch_override: Callable[..., list[dict[str, object]]] | None = None,
+    fetch_override: Callable[..., pd.DataFrame] | None = None,
 ) -> DataConnector:
     source_id = "connector.noaa_storm_events"
 
-    def _fetch(county_id: str, **extras: object) -> pd.DataFrame:
-        payload = (
-            fetch_override(county_id=county_id, **extras)
-            if fetch_override
-            else [
-                {
-                    "county_id": county_id,
-                    "winter_storms_10yr_county": 4,
-                    "observed_at": _observed_at(),
-                    "source_id": source_id,
-                }
-            ]
-        )
-        return pd.DataFrame(payload)
+    def _fetch(county_id: str, state_abbr: str | None = None, **extras: Any) -> pd.DataFrame:
+        if fetch_override is not None:
+            return fetch_override(county_id=county_id, state_abbr=state_abbr, **extras)
+        fips_state = county_id[:2]
+        resolved_state = state_abbr or STATE_FIPS_TO_ABBR.get(fips_state)
+        if resolved_state is None:
+            raise ConnectorError(
+                "Storm events requires state abbreviation",
+                context={"county_id": county_id},
+            )
+        county_fips = county_id[-3:]
+        frame = fetch_storm_events(county_fips=county_fips, state_abbr=resolved_state)
+        frame["source_id"] = source_id
+        return frame
 
     conn = callable_connector(source_id, _fetch, ttl_seconds=ttl_seconds)
     conn.schema_version = "1"
@@ -208,24 +231,16 @@ def make_noaa_storm_events_connector(
 def make_pad_us_connector(
     *,
     ttl_seconds: int = 365 * 86_400,
-    fetch_override: Callable[..., list[dict[str, object]]] | None = None,
+    config: PadUSConfig | None = None,
+    fetch_override: Callable[..., pd.DataFrame] | None = None,
 ) -> DataConnector:
     source_id = "connector.pad_us"
+    cfg = config or PadUSConfig()
 
-    def _fetch(place_id: str, **extras: object) -> pd.DataFrame:
-        payload = (
-            fetch_override(place_id=place_id, **extras)
-            if fetch_override
-            else [
-                {
-                    "place_id": place_id,
-                    "public_land_acres_30min": 1250.0,
-                    "observed_at": _observed_at(),
-                    "source_id": source_id,
-                }
-            ]
-        )
-        return pd.DataFrame(payload)
+    def _fetch(place_id: str, **extras: Any) -> pd.DataFrame:
+        if fetch_override is not None:
+            return fetch_override(place_id=place_id, **extras)
+        return fetch_pad_us(place_id=place_id, config=cfg)
 
     conn = callable_connector(source_id, _fetch, ttl_seconds=ttl_seconds)
     conn.schema_version = "1"
@@ -236,24 +251,16 @@ def make_pad_us_connector(
 def make_fcc_bdc_connector(
     *,
     ttl_seconds: int = 240 * 86_400,
-    fetch_override: Callable[..., list[dict[str, object]]] | None = None,
+    config: FCCBDCConfig | None = None,
+    fetch_override: Callable[..., pd.DataFrame] | None = None,
 ) -> DataConnector:
     source_id = "connector.fcc_bdc"
+    cfg = config or FCCBDCConfig()
 
-    def _fetch(geo_id: str, **extras: object) -> pd.DataFrame:
-        payload = (
-            fetch_override(geo_id=geo_id, **extras)
-            if fetch_override
-            else [
-                {
-                    "geo_id": geo_id,
-                    "broadband_gbps_flag": True,
-                    "observed_at": _observed_at(),
-                    "source_id": source_id,
-                }
-            ]
-        )
-        return pd.DataFrame(payload)
+    def _fetch(geo_id: str, **extras: Any) -> pd.DataFrame:
+        if fetch_override is not None:
+            return fetch_override(geo_id=geo_id, **extras)
+        return fetch_fcc_broadband(geo_id=geo_id, config=cfg)
 
     conn = callable_connector(source_id, _fetch, ttl_seconds=ttl_seconds)
     conn.schema_version = "1"
@@ -264,24 +271,16 @@ def make_fcc_bdc_connector(
 def make_hud_fmr_connector(
     *,
     ttl_seconds: int = 400 * 86_400,
-    fetch_override: Callable[..., list[dict[str, object]]] | None = None,
+    config: HUDFMRConfig | None = None,
+    fetch_override: Callable[..., pd.DataFrame] | None = None,
 ) -> DataConnector:
     source_id = "connector.hud_fmr"
+    cfg = config or HUDFMRConfig()
 
-    def _fetch(geo_id: str, **extras: object) -> pd.DataFrame:
-        payload = (
-            fetch_override(geo_id=geo_id, **extras)
-            if fetch_override
-            else [
-                {
-                    "geo_id": geo_id,
-                    "hud_fmr_2br": 1750.0,
-                    "observed_at": _observed_at(),
-                    "source_id": source_id,
-                }
-            ]
-        )
-        return pd.DataFrame(payload)
+    def _fetch(geo_id: str, **extras: Any) -> pd.DataFrame:
+        if fetch_override is not None:
+            return fetch_override(geo_id=geo_id, **extras)
+        return fetch_hud_fmr(geo_id=geo_id, config=cfg)
 
     conn = callable_connector(source_id, _fetch, ttl_seconds=ttl_seconds)
     conn.schema_version = "1"
@@ -292,24 +291,16 @@ def make_hud_fmr_connector(
 def make_eia_v2_connector(
     *,
     ttl_seconds: int = 120 * 86_400,
-    fetch_override: Callable[..., list[dict[str, object]]] | None = None,
+    config: EIAConfig | None = None,
+    fetch_override: Callable[..., pd.DataFrame] | None = None,
 ) -> DataConnector:
     source_id = "connector.eia_v2"
+    cfg = config or EIAConfig()
 
-    def _fetch(state: str, **extras: object) -> pd.DataFrame:
-        payload = (
-            fetch_override(state=state, **extras)
-            if fetch_override
-            else [
-                {
-                    "state": state,
-                    "res_price_cents_per_kwh": 13.2,
-                    "observed_at": _observed_at(),
-                    "source_id": source_id,
-                }
-            ]
-        )
-        return pd.DataFrame(payload)
+    def _fetch(state: str, **extras: Any) -> pd.DataFrame:
+        if fetch_override is not None:
+            return fetch_override(state=state, **extras)
+        return fetch_eia_rates(state=state, config=cfg)
 
     conn = callable_connector(source_id, _fetch, ttl_seconds=ttl_seconds)
     conn.schema_version = "1"
@@ -320,24 +311,16 @@ def make_eia_v2_connector(
 def make_usfs_trails_connector(
     *,
     ttl_seconds: int = 365 * 86_400,
-    fetch_override: Callable[..., list[dict[str, object]]] | None = None,
+    config: USFSTrailsConfig | None = None,
+    fetch_override: Callable[..., pd.DataFrame] | None = None,
 ) -> DataConnector:
     source_id = "connector.usfs_trails"
+    cfg = config or USFSTrailsConfig()
 
-    def _fetch(place_id: str, **extras: object) -> pd.DataFrame:
-        payload = (
-            fetch_override(place_id=place_id, **extras)
-            if fetch_override
-            else [
-                {
-                    "place_id": place_id,
-                    "minutes_to_trailhead": 18.0,
-                    "observed_at": _observed_at(),
-                    "source_id": source_id,
-                }
-            ]
-        )
-        return pd.DataFrame(payload)
+    def _fetch(place_id: str, **extras: Any) -> pd.DataFrame:
+        if fetch_override is not None:
+            return fetch_override(place_id=place_id, **extras)
+        return fetch_usfs_trails(place_id=place_id, config=cfg)
 
     conn = callable_connector(source_id, _fetch, ttl_seconds=ttl_seconds)
     conn.schema_version = "1"
@@ -348,24 +331,16 @@ def make_usfs_trails_connector(
 def make_usgs_epqs_connector(
     *,
     ttl_seconds: int = 365 * 86_400,
-    fetch_override: Callable[..., list[dict[str, object]]] | None = None,
+    config: USGSEPQSConfig | None = None,
+    fetch_override: Callable[..., pd.DataFrame] | None = None,
 ) -> DataConnector:
     source_id = "connector.usgs_epqs"
+    cfg = config or USGSEPQSConfig()
 
-    def _fetch(place_id: str, **extras: object) -> pd.DataFrame:
-        payload = (
-            fetch_override(place_id=place_id, **extras)
-            if fetch_override
-            else [
-                {
-                    "place_id": place_id,
-                    "slope_gt15_pct_within_10km": 22.5,
-                    "observed_at": _observed_at(),
-                    "source_id": source_id,
-                }
-            ]
-        )
-        return pd.DataFrame(payload)
+    def _fetch(place_id: str, **extras: Any) -> pd.DataFrame:
+        if fetch_override is not None:
+            return fetch_override(place_id=place_id, **extras)
+        return fetch_usgs_epqs(place_id=place_id, config=cfg)
 
     conn = callable_connector(source_id, _fetch, ttl_seconds=ttl_seconds)
     conn.schema_version = "1"
@@ -373,8 +348,7 @@ def make_usgs_epqs_connector(
     return conn
 
 
-# Register the default census connector and hazard/context connectors on import so
-# tests observe them without additional wiring.
+# Register default connectors on import so tests observe them without extra wiring.
 make_census_acs_connector()
 make_usfs_wildfire_connector()
 make_usgs_designmaps_connector()

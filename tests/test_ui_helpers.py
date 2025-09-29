@@ -1,4 +1,8 @@
+from pathlib import Path
+from typing import Any, Dict
+
 import pandas as pd
+
 from west_housing_model.ui import (
     SPEC_VERSION,
     build_manifest,
@@ -10,7 +14,7 @@ from west_housing_model.ui import (
 )
 
 
-def test_manifest_and_filenames():
+def test_manifest_and_filenames() -> None:
     manifest = build_manifest(as_of=pd.Timestamp("2025-09-01"), sources={"census_acs": "2023-12"})
     assert manifest["as_of"] == "2025-09"
     assert manifest["sources"]["census_acs"] == "2023-12"
@@ -21,15 +25,15 @@ def test_manifest_and_filenames():
     )
 
 
-def test_choose_manifest_locked_and_unlocked():
-    saved = {"as_of": "2025-08", "sources": {"x": "1"}}
-    current = {"as_of": "2025-09", "sources": {"x": "2"}}
+def test_choose_manifest_locked_and_unlocked() -> None:
+    saved: Dict[str, Any] = {"as_of": "2025-08", "sources": {"x": "1"}}
+    current: Dict[str, Any] = {"as_of": "2025-09", "sources": {"x": "2"}}
     assert choose_manifest(locked=True, saved_manifest=saved, current_manifest=current) == saved
     assert choose_manifest(locked=False, saved_manifest=saved, current_manifest=current) == current
 
 
-def test_save_and_load_scenario_roundtrip():
-    store = {}
+def test_save_and_load_scenario_roundtrip() -> None:
+    store: Dict[str, Any] = {}
     scn = {
         "scenario_id": "scn1",
         "property_id": "prop1",
@@ -38,7 +42,7 @@ def test_save_and_load_scenario_roundtrip():
         "source_manifest": {"as_of": "2025-09", "sources": {}},
     }
     # save
-    from west_housing_model.ui.state import Scenario, save_scenario  # type: ignore
+    from west_housing_model.ui.state import Scenario, save_scenario
 
     save_scenario(store, Scenario(**scn))
     # load
@@ -49,9 +53,9 @@ def test_save_and_load_scenario_roundtrip():
     assert str(loaded.as_of)[:7] == "2025-09"
 
 
-def test_exporters_embed_manifest(tmp_path):
+def test_exporters_embed_manifest(tmp_path: Path) -> None:
     frame = pd.DataFrame({"a": [1]})
-    manifest = {"as_of": "2025-09", "sources": {"x": "1"}}
+    manifest: Dict[str, Any] = {"as_of": "2025-09", "sources": {"x": "1"}}
     csv_bytes = export_csv(frame, manifest=manifest)
     assert b"source_manifest" in csv_bytes
     pdf_bytes = export_pdf_onepager("Summary", manifest=manifest)

@@ -3,9 +3,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Dict, Mapping, Optional
+from typing import Any, Dict, Mapping, Optional, Sequence
 
-import numpy as np
 import pandas as pd
 
 from west_housing_model.data.catalog import validate_table
@@ -68,6 +67,31 @@ def _compute_opex_and_insurance(inputs: ValuationInputs) -> Dict[str, Any]:
     }
 
 
+def _irr(cashflows: Sequence[float], *, guess: float = 0.1) -> float:
+    rate = guess
+    for _ in range(100):
+        if rate <= -0.999:
+            rate = -0.5
+        npv = 0.0
+        derivative = 0.0
+        for period, cash in enumerate(cashflows):
+            denom = (1.0 + rate) ** period
+            if denom == 0:
+                denom = 1e-12
+            npv += cash / denom
+            if period > 0:
+                derivative -= period * cash / ((1.0 + rate) ** (period + 1))
+        if abs(derivative) < 1e-9:
+            break
+        new_rate = rate - npv / derivative
+        if abs(new_rate - rate) < 1e-6:
+            if -0.999 < new_rate < 10:
+                return float(new_rate)
+            break
+        rate = new_rate
+    return float(max(rate, 0.0))
+
+
 def _compute_capex(inputs: ValuationInputs) -> Dict[str, Any]:
     plan = inputs.user_overrides.get("capex_plan", {})
 
@@ -85,7 +109,8 @@ def _compute_capex(inputs: ValuationInputs) -> Dict[str, Any]:
     contingency_pct = 0.0
     if bool(inputs.site_features.get("in_sfha", False)):
         contingency_pct += 0.05
-    if inputs.site_features.get("pga_10in50_g") and float(inputs.site_features.get("pga_10in50_g")) >= 0.15:
+    pga_value = _coerce(inputs.site_features.get("pga_10in50_g"))
+    if pga_value >= 0.15:
         contingency_pct += 0.02
 
     total_with_contingency = base_total * (1.0 + contingency_pct)
@@ -221,10 +246,7 @@ def _compute_dcf(
                 terminal = (noi * (1.0 + terminal_growth)) / max(exit_cap, 0.0001)
                 cash += terminal
             cashflows.append(cash)
-        irr = np.irr(cashflows)
-        if irr is None or np.isnan(irr):
-            return 0.0
-        return float(irr)
+        return _irr(cashflows)
 
     irr_base = _irr_for(cap_base)
     irr_low = _irr_for(cap_high)
@@ -286,10 +308,15 @@ def run_valuation(inputs: ValuationInputs) -> pd.DataFrame:
     rent = _compute_rent_baseline(inputs)
     growth = _compute_growth(inputs)
     costs = _compute_opex_and_insurance(inputs)
-    _ = _compute_capex(inputs)
+    capex = _compute_capex(inputs)
     dcf = _compute_dcf(
-        inputs, rent["rent_baseline"], growth["growth"], costs["opex_per_unit_year"]
-    )  # noqa: E501
+        inputs,
+        rent["rent_baseline"],
+        growth["growth"],
+        costs["opex_per_unit_year"],
+        costs["insurance_uplift"],
+        capex["capex_schedule"],
+    )
 
     # Compute Deal Quality using available context
     wildfire = inputs.site_features.get("wildfire_risk_percentile")

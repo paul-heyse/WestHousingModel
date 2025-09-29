@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import logging
 from pathlib import Path
+from typing import Any, Dict
 
 import pandas as pd
 
@@ -49,6 +50,28 @@ def test_cli_features_builds_place_and_site(
     assert (out_dir / "site_features.parquet").exists()
 
 
+def test_cli_features_ops_writes_provenance(tmp_path: Path) -> None:
+    ops_csv = tmp_path / "ops.csv"
+    ops_csv.write_text(
+        "property_id,as_of,eia_state,eia_res_price_cents_per_kwh,broadband_gbps_flag,"
+        "zoning_context_note,hud_fmr_2br\n"
+        "p-ops,2025-02-01,CO,13.5,True,Allowance,1800\n"
+    )
+
+    out_dir = tmp_path / "ops_output"
+    exit_code = main(["features", "--ops", str(ops_csv), "--output", str(out_dir)])
+    assert exit_code == 0
+    ops_path = out_dir / "ops_features.parquet"
+    prov_path = out_dir / "ops_features_provenance.json"
+    assert ops_path.exists()
+    assert prov_path.exists()
+    provenance_payload = json.loads(prov_path.read_text())
+    assert provenance_payload[0]["property_id"] == "p-ops"
+    assert (
+        provenance_payload[0]["provenance"]["utility_rate_note"]["source_id"] == "connector.eia_v2"
+    )
+
+
 def test_cli_render_outputs_json(tmp_path: Path, scenario_payload: dict) -> None:
     scenario_path = tmp_path / "scenario.json"
     scenario_path.write_text(json.dumps(scenario_payload))
@@ -67,7 +90,10 @@ def test_cli_render_outputs_json(tmp_path: Path, scenario_payload: dict) -> None
     assert isinstance(data[0]["sensitivity_matrix"], list)
 
 
-def test_cli_refresh_online_and_offline(tmp_path: Path, capsys, caplog, temp_cache_dir: Path) -> None:
+def test_cli_refresh_online_and_offline(
+    tmp_path: Path, capsys, caplog, temp_cache_dir: Path
+) -> None:
+    _ = temp_cache_dir
     events = []
 
     def fetch_stub(**_: object) -> pd.DataFrame:
@@ -96,7 +122,9 @@ def test_cli_refresh_online_and_offline(tmp_path: Path, capsys, caplog, temp_cac
     captured_online = json.loads(capsys.readouterr().out.strip())
     assert captured_online["status"] == "refreshed"
     assert captured_online["cache_hit"] is False
-    online_logs = [json.loads(record.message) for record in caplog.records if record.message.startswith("{")]
+    online_logs = [
+        json.loads(record.message) for record in caplog.records if record.message.startswith("{")
+    ]
     assert any(entry.get("status") == "refreshed" for entry in online_logs)
     assert events == ["fetch"]
 
@@ -107,5 +135,7 @@ def test_cli_refresh_online_and_offline(tmp_path: Path, capsys, caplog, temp_cac
     captured_offline = json.loads(capsys.readouterr().out.strip())
     assert captured_offline["status"] == "stale"
     assert captured_offline["cache_hit"] is True
-    offline_logs = [json.loads(record.message) for record in caplog.records if record.message.startswith("{")]
+    offline_logs = [
+        json.loads(record.message) for record in caplog.records if record.message.startswith("{")
+    ]
     assert any(entry.get("status") == "stale" for entry in offline_logs)

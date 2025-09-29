@@ -1,3 +1,5 @@
+# Tasks: add-deal-quality-scoring
+
 ## 1. Implementation
 
 - [x] 1.1 Add scoring/deal_quality.py with pure function(s) and validation.

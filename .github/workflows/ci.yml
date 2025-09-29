@@ -47,7 +47,23 @@ jobs:
         env:
           PYTHONPATH: src
         run: |
-          pytest -q --maxfail=1 --disable-warnings --cov=src --cov-report=term-missing
+          pytest -q -m "not performance" --maxfail=1 --disable-warnings --cov=src --cov-report=term-missing
+
+      - name: Performance smoke test
+        id: performance_smoke_test
+        shell: bash -l {0}
+        env:
+          PYTHONPATH: src
+          PERF_SMOKE_REPORT: perf-smoke-report.json
+        run: |
+          pytest -q -m performance --maxfail=1 --disable-warnings
+
+      - name: Upload performance report
+        if: ${{ always() && steps.performance_smoke_test.outcome == 'success' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: perf-smoke-report
+          path: perf-smoke-report.json
 
       - name: Validate OpenSpec (strict)
         shell: bash -l {0}
@@ -57,25 +73,3 @@ jobs:
           else
             echo "openspec not installed; skipping validate"
           fi
-name: CI
-on:
-  push:
-  pull_request:
-
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up micromamba
-        uses: mamba-org/setup-micromamba@v2
-        with:
-          environment-file: environment.yml
-          environment-name: ci
-          cache-downloads: true
-          cache-env: true
-      - name: Run tests
-        shell: bash -l {0}
-        run: |
-          python -V
-          pytest -q

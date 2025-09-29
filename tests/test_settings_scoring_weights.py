@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+import pytest
+
 from west_housing_model.settings import get_pillar_weights, get_returns_weights
 
 
-def test_pillar_weights_defaults_and_normalization(monkeypatch) -> None:
+def test_pillar_weights_defaults_and_normalization(monkeypatch: pytest.MonkeyPatch) -> None:
     # No env vars → equal weights
     w = get_pillar_weights()
     assert sum(w.values()) == 1.0
@@ -19,7 +21,7 @@ def test_pillar_weights_defaults_and_normalization(monkeypatch) -> None:
     assert w2["pillar_uc"] > w2["pillar_oa"] > w2["pillar_sc"]
 
 
-def test_returns_weights_defaults_and_normalization(monkeypatch) -> None:
+def test_returns_weights_defaults_and_normalization(monkeypatch: pytest.MonkeyPatch) -> None:
     rw = get_returns_weights()
     assert abs(rw.yoy_yoc + rw.irr_5yr + rw.dscr - 1.0) < 1e-9
 

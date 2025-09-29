@@ -5,21 +5,19 @@ import logging
 from pathlib import Path
 
 import pandas as pd
-
 import pytest
 
 from west_housing_model.data.connectors import callable_connector
 from west_housing_model.data.repository import (
+    STATUS_FRESH,
     STATUS_REFRESHED,
     STATUS_STALE,
     Repository,
 )
 
 
-def test_repository_writes_failure_log_and_returns_stale(tmp_path: Path, monkeypatch) -> None:
-    monkeypatch.setenv("WEST_HOUSING_MODEL_FAILURE_CACHE", str(tmp_path / "failures"))
-
-    payload = pd.DataFrame(
+def _valid_connector_frame() -> pd.DataFrame:
+    return pd.DataFrame(
         {
             "place_id": ["p-001"],
             "metric": ["msa_jobs_t12"],
@@ -28,6 +26,12 @@ def test_repository_writes_failure_log_and_returns_stale(tmp_path: Path, monkeyp
             "source_id": ["connector.place_context"],
         }
     )
+
+
+def test_repository_writes_failure_log_and_returns_stale(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setenv("WEST_HOUSING_MODEL_FAILURE_CACHE", str(tmp_path / "failures"))
+
+    payload = _valid_connector_frame()
 
     class Flaky:
         def __init__(self) -> None:
@@ -57,7 +61,9 @@ def test_repository_writes_failure_log_and_returns_stale(tmp_path: Path, monkeyp
     assert "correlation_id" in data
 
 
-def test_repository_logs_status_transitions(tmp_path: Path, caplog: pytest.LogCaptureFixture) -> None:
+def test_repository_logs_status_transitions(
+    tmp_path: Path, caplog: pytest.LogCaptureFixture
+) -> None:
     payload = _valid_connector_frame()
 
     connector = callable_connector(
@@ -69,13 +75,17 @@ def test_repository_logs_status_transitions(tmp_path: Path, caplog: pytest.LogCa
 
     caplog.set_level(logging.INFO, logger="west_housing_model")
     first = repo.get("connector.place_context")
-    logs_first = [json.loads(record.message) for record in caplog.records if record.message.startswith("{")]
+    logs_first = [
+        json.loads(record.message) for record in caplog.records if record.message.startswith("{")
+    ]
     assert any(entry.get("status") == STATUS_REFRESHED for entry in logs_first)
     assert first.status == STATUS_REFRESHED
     caplog.clear()
 
     second = repo.get("connector.place_context")
-    logs_second = [json.loads(record.message) for record in caplog.records if record.message.startswith("{")]
+    logs_second = [
+        json.loads(record.message) for record in caplog.records if record.message.startswith("{")
+    ]
     assert any(entry.get("status") == STATUS_FRESH for entry in logs_second)
     assert second.status == STATUS_FRESH
     assert first.correlation_id != ""

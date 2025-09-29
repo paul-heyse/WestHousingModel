@@ -9,7 +9,7 @@ configurable weights. The function is pure and performs simple input hygiene:
 
 from __future__ import annotations
 
-from typing import Mapping, Optional
+from typing import Any, Mapping, Optional
 
 import pandas as pd
 from pandera import Column, DataFrameSchema
@@ -22,7 +22,7 @@ DEFAULT_PILLAR_WEIGHTS: Mapping[str, float] = {
 }
 
 
-PILLAR_SCHEMA = DataFrameSchema(  # type: ignore[no-untyped-call]
+PILLAR_SCHEMA: Any = DataFrameSchema(  # type: ignore[no-untyped-call]
     {
         "pillar_uc": Column(float, nullable=True, required=False),
         "pillar_oa": Column(float, nullable=True, required=False),

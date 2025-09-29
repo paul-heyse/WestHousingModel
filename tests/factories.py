@@ -182,4 +182,3 @@ def make_scenario_payload() -> Dict[str, Any]:
             "affordability_overridden": False,
         },
     }
-

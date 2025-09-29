@@ -6,7 +6,7 @@ from west_housing_model.features.site_features import (
 )
 
 
-def test_build_site_features_from_components_happy_path():
+def test_build_site_features_from_components_happy_path() -> None:
     base = pd.DataFrame(
         {
             "property_id": ["p1"],
@@ -82,7 +82,7 @@ def test_build_site_features_from_components_happy_path():
     assert out.loc[0, "broadband_gbps_flag"] is True
 
 
-def test_extract_provenance_sidecar_fields():
+def test_extract_provenance_sidecar_fields() -> None:
     hazards = pd.DataFrame(
         {
             "property_id": ["p1", "p1"],

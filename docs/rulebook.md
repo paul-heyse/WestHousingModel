@@ -5,11 +5,15 @@ Authoritative formulas and governance for scoring and valuation.
 ## Scoring
 
 ### Aker Fit (AF)
+
 AF = round(100 * (w_uc*UC + w_oa*OA + w_ij*IJ + w_sc*SC)), defaults w=0.25 each.
+
 - Components normalized to percentiles within peer group; invert times where needed.
 
 ### Deal Quality (DQ)
+
 DQ = clamp(0,100, round(R - (Pen_haz + Pen_supply + Pen_aff + Pen_data)))
+
 - R = weighted YoC/IRR/DSCR mapped to 0..100 via tables.
 - Penalties follow thresholds in `architecture.md` §6.4.2.
 

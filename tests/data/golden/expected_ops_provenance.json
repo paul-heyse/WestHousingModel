@@ -1,0 +1,27 @@
+{
+  "utility_rate_note": {
+    "source_id": "connector.eia_v2",
+    "as_of": "2025-02-01 00:00:00",
+    "transformation": "scaled utilities note"
+  },
+  "utilities_scaler": {
+    "source_id": "connector.eia_v2",
+    "as_of": "2025-02-01 00:00:00",
+    "transformation": "res_price_cents_per_kwh/12 clamp"
+  },
+  "broadband_gbps_flag": {
+    "source_id": "connector.fcc_bdc",
+    "as_of": "2025-02-01 00:00:00",
+    "transformation": "boolean"
+  },
+  "zoning_context_note": {
+    "source_id": "ops.features",
+    "as_of": "2025-02-01 00:00:00",
+    "transformation": "pass-through"
+  },
+  "hud_fmr_2br": {
+    "source_id": "ops.features",
+    "as_of": null,
+    "transformation": "default"
+  }
+}

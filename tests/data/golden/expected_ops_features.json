@@ -1,0 +1,12 @@
+[
+  {
+    "property_id": "s-1",
+    "as_of": "2025-02-01",
+    "source_id": "ops.features",
+    "utility_rate_note": "Utilities (CO RES): 13.5 c/kWh",
+    "broadband_gbps_flag": true,
+    "zoning_context_note": "MF allowed",
+    "utilities_scaler": 1.125,
+    "hud_fmr_2br": null
+  }
+]

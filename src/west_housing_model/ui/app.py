@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any, Dict
+from typing import TYPE_CHECKING, Any, Dict, MutableMapping, cast
 
 import pandas as pd
 
@@ -19,6 +19,7 @@ from west_housing_model.ui import (
 from west_housing_model.ui.components import (
     format_tooltip,  # noqa: F401 (placeholder for future UI)
 )
+from west_housing_model.ui.state import Scenario
 from west_housing_model.valuation import ValuationInputs, run_valuation
 
 
@@ -26,7 +27,9 @@ def _run_evaluate(scenario_payload: dict[str, Any]) -> pd.DataFrame:
     inputs = ValuationInputs(
         scenario_id=scenario_payload.get("scenario_id", ""),
         property_id=scenario_payload.get("property_id", ""),
-        as_of=pd.to_datetime(scenario_payload.get("as_of")) if scenario_payload.get("as_of") else None,
+        as_of=(
+            pd.to_datetime(scenario_payload.get("as_of")) if scenario_payload.get("as_of") else None
+        ),
         place_features=scenario_payload.get("place_features", {}),
         site_features=scenario_payload.get("site_features", {}),
         ops_features=scenario_payload.get("ops_features", {}),
@@ -105,7 +108,11 @@ def page_evaluate() -> Dict[str, Any]:  # pragma: no cover - requires Streamlit
             "place_features": {"aker_market_fit": int(af)},
             "site_features": {},
             "ops_features": {},
-            "user_overrides": {"rent_baseline": float(rent), "units": int(units), "cap_base": float(cap)},
+            "user_overrides": {
+                "rent_baseline": float(rent),
+                "units": int(units),
+                "cap_base": float(cap),
+            },
         }
         prov = _build_provenance_from_inputs(payload)
         # Re-render inputs with provenance tooltips
@@ -113,11 +120,20 @@ def page_evaluate() -> Dict[str, Any]:  # pragma: no cover - requires Streamlit
         st.caption(format_tooltip("Rent Baseline", prov.get("rent_baseline")))
         st.caption(format_tooltip("Cap Rate (base)", prov.get("cap_base")))
         import time
+
         t0 = time.perf_counter()
+
         # Cache evaluation by payload signature
-        @st.cache_data
-        def _cached_eval(p: dict[str, Any]) -> pd.DataFrame:
-            return _run_evaluate(p)
+        if TYPE_CHECKING:
+
+            def _cached_eval(p: dict[str, Any]) -> pd.DataFrame:
+                return _run_evaluate(p)
+
+        else:
+
+            @st.cache_data
+            def _cached_eval(p: dict[str, Any]) -> pd.DataFrame:
+                return _run_evaluate(p)
 
         out = _cached_eval(payload)
         dt = time.perf_counter() - t0
@@ -132,8 +148,8 @@ def page_scenarios() -> Dict[str, Any]:  # pragma: no cover - requires Streamlit
     st.title("Scenarios")
     st.caption("Save and load scenarios; persist to disk")
 
-    store: Dict[str, Any] = st.session_state.setdefault("whm", {})  # in-memory store
-    loaded = load_scenario(store)  # type: ignore[arg-type]
+    store = cast(MutableMapping[str, Any], st.session_state.setdefault("whm", {}))
+    loaded = load_scenario(store)
     st.write("Loaded:", loaded)
 
     scenario_json = st.text_area("Scenario JSON", value="{}", height=200)
@@ -143,16 +159,30 @@ def page_scenarios() -> Dict[str, Any]:  # pragma: no cover - requires Streamlit
         except Exception as exc:
             st.error(f"Invalid JSON: {exc}")
         else:
-            save_scenario(store,  # type: ignore[arg-type]
-                         type("_S", (), payload)())  # quick-and-dirty struct
+            scenario_obj = Scenario(
+                scenario_id=str(payload.get("scenario_id", "")),
+                property_id=str(payload.get("property_id", "")),
+                as_of=(pd.to_datetime(payload.get("as_of")) if payload.get("as_of") else None),
+                user_overrides=dict(payload.get("user_overrides", {})),
+                source_manifest=dict(payload.get("source_manifest", {})),
+            )
+            save_scenario(store, scenario_obj)
             st.success("Saved to session state")
 
-    if st.button("Export CSV" ):
+    if st.button("Export CSV"):
         try:
             payload = json.loads(scenario_json)
             out = _run_evaluate(payload)
-            manifest = build_manifest(as_of=pd.Timestamp(payload.get("as_of") or pd.Timestamp.now()), sources={})
-            st.download_button("Download CSV", export_csv(out, manifest=manifest), file_name=deterministic_export_filename("csv", payload.get("scenario_id", "scn"), manifest["as_of"]))
+            manifest = build_manifest(
+                as_of=pd.Timestamp(payload.get("as_of") or pd.Timestamp.now()), sources={}
+            )
+            st.download_button(
+                "Download CSV",
+                export_csv(out, manifest=manifest),
+                file_name=deterministic_export_filename(
+                    "csv", payload.get("scenario_id", "scn"), manifest["as_of"]
+                ),
+            )
         except Exception as exc:
             st.error(str(exc))
     return {}
@@ -189,7 +219,9 @@ def main() -> int:  # pragma: no cover - UI entrypoint would be exercised manual
             df = _run_evaluate(payload)
             print(df.to_json(orient="records"))
             return 0
-        print("Install streamlit and run 'streamlit run -m west_housing_model.ui.app' to launch UI.")
+        print(
+            "Install streamlit and run 'streamlit run -m west_housing_model.ui.app' to launch UI."
+        )
         return 0
 
     st.set_page_config(page_title="West Housing Model", layout="wide")
@@ -207,5 +239,3 @@ def main() -> int:  # pragma: no cover - UI entrypoint would be exercised manual
 
 if __name__ == "__main__":  # pragma: no cover
     raise SystemExit(main())
-
-

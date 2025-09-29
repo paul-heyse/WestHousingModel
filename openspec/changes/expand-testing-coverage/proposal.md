@@ -1,4 +1,4 @@
-## Why
+# Why
 
 Current tests cover repository basics but lack structured assertions for logging, multi-connector workflows, and golden scenarios tying feature builders to valuation outputs. Architecture.md §17 calls for unit, integration, and golden coverage before rollout.
 

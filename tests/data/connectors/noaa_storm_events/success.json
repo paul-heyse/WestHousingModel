@@ -1,0 +1,8 @@
+[
+  {
+    "county_id": "08005",
+    "winter_storms_10yr_county": 12,
+    "observed_at": "2025-02-01",
+    "source_id": "connector.noaa_storm_events"
+  }
+]

@@ -9,6 +9,7 @@ dependencies:
   - mypy
   - pytest
   - pytest-cov
+  - pytest-recording
   - ipykernel
   - pre-commit
   - pip:

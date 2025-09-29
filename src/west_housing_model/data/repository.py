@@ -24,7 +24,7 @@ from typing import Any, Callable, Dict, Iterable, Iterator, Mapping, Optional, P
 import pandas as pd
 
 from west_housing_model.core.exceptions import CacheError, ConnectorError, SchemaError
-from west_housing_model.data.catalog import failure_capture_path
+from west_housing_model.data.catalog import failure_capture_path, validate_connector
 from west_housing_model.utils.logging import (
     LogContext,
     correlation_context,
@@ -333,15 +333,23 @@ class CacheStore:
         frame: pd.DataFrame,
         ttl_days: int,
         schema_version: Optional[str],
+        *,
+        created_at: Optional[datetime] = None,
     ) -> CacheIndexRecord:
         artifact = self.artifact_path(source_id, key_hash)
         artifact.parent.mkdir(parents=True, exist_ok=True)
         frame.to_parquet(artifact, index=False)
+        data_payload_path = artifact.with_suffix(".json")
+        try:
+            frame.head(20).to_json(data_payload_path, orient="records", date_format="iso")
+        except Exception:
+            if data_payload_path.exists():
+                data_payload_path.unlink(missing_ok=True)
         record = CacheIndexRecord(
             source_id=source_id,
             key_hash=key_hash,
             relative_path=artifact.relative_to(self.root),
-            created_at=_utcnow(),
+            created_at=created_at or _utcnow(),
             as_of=_extract_as_of(frame),
             ttl_days=ttl_days,
             rows=_deterministic_rows(frame),
@@ -419,7 +427,7 @@ class Repository:
                         f"Offline mode: no cached artifact for '{source_id}'",
                         context={"source_id": source_id, "cache_key": key_hash},
                     )
-                frame = self._store.load(record)
+                frame = validate_connector(source_id, self._store.load(record), lazy=True)
                 artifact_path = self._store.root / record.relative_path
                 duration_ms = _elapsed_ms(started_at, self.clock())
                 metadata = {
@@ -447,11 +455,12 @@ class Repository:
                     metadata=metadata,
                 )
 
+            lock_path = self._store.lock_path(source_id)
+
             if record and record.is_fresh(now):
                 artifact_path = self._store.root / record.relative_path
                 if not artifact_path.exists():
-                    frame = connector.fetch(**query)
-                    lock_path = self._store.lock_path(source_id)
+                    frame = validate_connector(source_id, connector.fetch(**query))
                     with _source_lock(lock_path):
                         record = self._store.write(
                             source_id=source_id,
@@ -462,6 +471,7 @@ class Repository:
                                 math.ceil(int(getattr(connector, "ttl_seconds", 86_400)) / 86_400),
                             ),
                             schema_version=_connector_schema_version(connector),
+                            created_at=self.clock(),
                         )
                     duration_ms = _elapsed_ms(started_at, self.clock())
                     metadata = {
@@ -489,7 +499,7 @@ class Repository:
                         correlation_id=correlation_id,
                         metadata=metadata,
                     )
-                frame = self._store.load(record)
+                frame = validate_connector(source_id, self._store.load(record), lazy=True)
                 duration_ms = _elapsed_ms(started_at, self.clock())
                 metadata = {
                     "rows": record.rows,
@@ -525,10 +535,27 @@ class Repository:
             try:
                 frame = connector.fetch(**query)
                 # Minimal schema sanity: require at least source_id or observed_at
-                if not isinstance(frame, pd.DataFrame) or ("source_id" not in frame.columns and "observed_at" not in frame.columns):
-                    _record_failure(source_id, "schema-validation-failed", correlation_id=correlation_id, details={"cache_key": key_hash})
+                if not isinstance(frame, pd.DataFrame) or (
+                    "source_id" not in frame.columns and "observed_at" not in frame.columns
+                ):
+                    _record_failure(
+                        source_id,
+                        "schema-validation-failed",
+                        correlation_id=correlation_id,
+                        details={"cache_key": key_hash},
+                    )
                     raise SchemaError("Connector schema invalid", context={"source_id": source_id})
             except SchemaError as exc:
+                _record_failure(
+                    source_id,
+                    str(exc),
+                    correlation_id=correlation_id,
+                    details={
+                        "cache_key": key_hash,
+                        "query_signature": query_signature,
+                        "error": exc.message,
+                    },
+                )
                 log_error(
                     context,
                     "fetch.schema-error",
@@ -565,7 +592,7 @@ class Repository:
                         correlation_id=correlation_id,
                         details={"cache_key": key_hash},
                     )
-                    frame = self._store.load(record)
+                    frame = validate_connector(source_id, self._store.load(record), lazy=True)
                     return RepositoryResult(
                         source_id=source_id,
                         frame=frame,
@@ -657,6 +684,7 @@ class Repository:
                     frame=frame,
                     ttl_days=ttl_days,
                     schema_version=schema_version,
+                    created_at=self.clock(),
                 )
 
             artifact_path = self._store.root / record.relative_path

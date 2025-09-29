@@ -1,0 +1,9 @@
+[
+  {
+    "geo_id": "08005012602",
+    "geo_level": "tract",
+    "median_household_income": 78000,
+    "observed_at": "2025-01-01",
+    "source_id": "connector.census_acs"
+  }
+]

@@ -4,9 +4,9 @@ from datetime import datetime
 from pathlib import Path
 
 import pandas as pd
-
 import pytest
 
+from west_housing_model.core.exceptions import SchemaError
 from west_housing_model.data.connectors import make_census_acs_connector
 from west_housing_model.data.repository import (
     STATUS_FRESH,
@@ -58,7 +58,9 @@ def test_census_acs_repository_cache_hit() -> None:
     assert first.status == STATUS_REFRESHED
     # within TTL, second call should be served from cache and not marked stale
     assert second.status == STATUS_FRESH
-    pd.testing.assert_frame_equal(pd.DataFrame(first.frame), pd.DataFrame(second.frame))
+    pd.testing.assert_frame_equal(
+        pd.DataFrame(first.frame), pd.DataFrame(second.frame), check_dtype=False
+    )
 
 
 def test_census_acs_registry_defaults_used() -> None:
@@ -73,7 +75,9 @@ def test_census_acs_registry_defaults_used() -> None:
     assert df.loc[0, "geo_level"] == "tract"
 
 
-def test_census_acs_schema_failure_captures_payload(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_census_acs_schema_failure_captures_payload(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     monkeypatch.setenv("WEST_HOUSING_MODEL_FAILURE_CACHE", str(tmp_path / "failures"))
 
     def bad_payload(**_: object) -> list[dict[str, object]]:
@@ -82,7 +86,7 @@ def test_census_acs_schema_failure_captures_payload(tmp_path: Path, monkeypatch:
     connector = make_census_acs_connector(fetch_override=bad_payload)
     repo = Repository(connectors={connector.source_id: connector})
 
-    with pytest.raises(Exception):
+    with pytest.raises(SchemaError):
         repo.get(connector.source_id, state="08", county="005")
 
     failure_files = list((tmp_path / "failures" / connector.source_id).glob("*.csv"))

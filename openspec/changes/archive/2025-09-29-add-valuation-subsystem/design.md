@@ -1,4 +1,4 @@
-## Context
+# Context
 
 Valuation converts features + user overrides into a deterministic value band and metrics. This design follows architecture Section 6.5 and Appendix mappings.
 

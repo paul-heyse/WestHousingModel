@@ -1,0 +1,12 @@
+[
+  {
+    "place_id": "denver",
+    "slope_gt15_pct_within_10km": 3.5,
+    "observed_at": "2025-02-01"
+  },
+  {
+    "place_id": "boise",
+    "slope_gt15_pct_within_10km": 6.8,
+    "observed_at": "2025-02-01"
+  }
+]

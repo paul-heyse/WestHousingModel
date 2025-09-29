@@ -1,5 +1,3 @@
-Below is a **single, stand‑alone document** you can drop in your repo as `openspec/specs/ARCHITECTURE.md`. It goes into *exceeding* depth so future contributors and IC reviewers can understand exactly **what** we’re building and **how** it fits together.
-
 ---
 
 # ARCHITECTURE
@@ -41,16 +39,16 @@ The architecture is layered: **Source Registry → Connectors & Cache → Featur
 
 ## 2) System Context & Personas
 
-**Personas**
+### Personas
 
 * **Investor/Operator (primary):** explores markets, screens addresses, tweaks a handful of pro‑forma inputs, exports one‑pagers.
 * **Data‑savvy teammate (secondary):** updates source registry, adds a connector, tunes weights, refreshes caches.
 
-**Execution Context**
+### Execution Context
 
 * Single machine; **Streamlit** GUI; local **SQLite + Parquet/GeoParquet** caches; optional internet for source refresh; **Offline mode** reads caches only.
 
-**High‑level Dataflow**
+### High-Level Dataflow
 
 ```
 +------------------+      +---------------------+      +-----------------+      +----------------+
@@ -123,19 +121,19 @@ A saved set of **user overrides** and **data vintages**.
 
 ### 6.1 Configuration & Source Registry
 
-**Files**
+# Files
 
 * `config/sources.yml` and `config/sources_supplement.yml` (checked into git; no secrets).
 
-**Required fields per source**
+## Required fields per source
 
 * `id` (unique), `enabled` (bool), `endpoint` (URL or dataset id), `geography` (msa/county/tract/point), `cadence` (monthly/quarterly/annual/as‑updated), `cache_ttl_days`, `license`, `rate_limit`, `auth_key_name` (if any), `notes`.
 
-**Registry Loader**
+## Registry Loader
 
 * Validates schema at startup; warns on missing/unknown fields; renders a **data dictionary** section in the UI Settings tab.
 
-**Principles**
+## Principles
 
 * **Central truth:** Only the registry decides which sources are active.
 * **Provenance:** Each record created from a source carries `{source_id, as_of}` forward.
@@ -144,14 +142,14 @@ A saved set of **user overrides** and **data vintages**.
 
 ### 6.2 Data Access: Connectors & Read‑Through Cache
 
-**Connector responsibilities (per source family)**
+## Connector responsibilities (per source family)
 
 * Accept structured queries (place codes, date spans, bounding boxes).
 * Fetch raw data (HTTP request, file read, or tiled overlay).
 * Normalize to a **small, typed DataFrame** with **documented columns**.
 * Append two metadata columns: `source_id` and `as_of` (year‑month or release date).
 
-**Cache design**
+## Cache design
 
 * **Artifacts:** Parquet / GeoParquet files under `src/west_housing_model/data/cache/`.
 * **Index:** SQLite with table `cache_index(source_id, key_hash, path, created_at, as_of, ttl_days, rows, schema_version)`.
@@ -159,11 +157,11 @@ A saved set of **user overrides** and **data vintages**.
 * **Read‑through:** Repository checks index → if **fresh** (not expired per TTL), return cached DF; otherwise fetch, validate, persist, update index, return.
 * **Offline mode:** Repository returns **stale** cache with a **warning** badge; never goes to network.
 
-**Concurrency**
+## Concurrency
 
 * Per‑source lock (file lock) to avoid duplicate writes; last writer wins with identical content hash.
 
-**Failure modes & recovery**
+## Failure modes & recovery
 
 * **Network fail:** return stale cache if present; bubble a “stale” status to UI.
 * **Schema drift:** connector emits a **versioned schema**; if drift detected, save raw payload to `cache/failures/{source_id}/…` and raise a clear error with mitigation steps.
@@ -172,7 +170,7 @@ A saved set of **user overrides** and **data vintages**.
 
 ### 6.3 Feature Builders (Pure, Deterministic)
 
-**General rules**
+## General rules
 
 * No I/O; inputs are **DataFrames** from connectors.
 * Enforce **column schemas** with Pandera on function boundaries.
@@ -180,7 +178,7 @@ A saved set of **user overrides** and **data vintages**.
 
 #### 6.3.1 Place Features (Pillars)
 
-**Urban Convenience**
+##### Urban Convenience
 
 * **Amenity counts**: OSM POIs for everyday needs (grocery, pharmacy, primary care, cafes, schools). Metrics:
 
@@ -197,25 +195,25 @@ A saved set of **user overrides** and **data vintages**.
 
   * `broadband_gbps_flag` (True if ≥1 Gbps available per FCC BDC).
 
-**Outdoor Access**
+##### Outdoor Access
 
 * `minutes_to_trailhead` (routing to nearest trailhead).
 * `public_land_acres_30min` (PAD‑US within 30‑min drive).
 * (Optional) `water_access_flag` if significant water bodies within 15 minutes.
 
-**Innovation Jobs**
+##### Innovation Jobs
 
 * `msa_jobs_t12` and `msa_jobs_t36` (%), BLS CES/LAUS.
 * `industry_mix_score` (optional): normalized LQs in healthcare, prof‑services, manufacturing.
 
-**Supply Constraints**
+##### Supply Constraints
 
 * `slope_gt15_pct_within_10km` (% area on slope >15%).
 * `protected_land_within_10km_pct` (%).
 * `permits_5plus_per_1k_hh_t12` (Census BPS normalized by households).
 * (Optional) `water_constraints_flag` (manual or state dataset flag).
 
-**Normalization & Aggregation**
+##### Normalization & Aggregation
 
 * For each pillar, **z‑score or percentile** within the peer group (e.g., within a state or across all scanned MSAs).
 * All components scaled so **higher = better** for the pillar (e.g., invert times: `score = 1 / (1 + minutes)` or percentile of the negative).
@@ -223,7 +221,7 @@ A saved set of **user overrides** and **data vintages**.
 
 #### 6.3.2 Site Features
 
-**Hazards**
+##### Hazards
 
 * **Flood** (FEMA NFHL):
 
@@ -247,7 +245,7 @@ A saved set of **user overrides** and **data vintages**.
 
   * `mf_allowed_flag`, `max_height_ft` (if present), otherwise `zoning_context_note`.
 
-**Ops Context**
+##### Ops Context
 
 * `utility_rate_context_note` (EIA/URDB; captured as text plus a state‑level cost band).
 * `broadband_gbps_flag` (propagated from place if site inherits same coverage).
@@ -258,14 +256,14 @@ A saved set of **user overrides** and **data vintages**.
 
 #### 6.4.1 Aker Fit (0–100)
 
-**Pillars (equal weight initially)**
+##### Pillars (equal weight initially)
 
 1. **Urban Convenience** → `UC`
 2. **Outdoor Access** → `OA`
 3. **Innovation Jobs** → `IJ`
 4. **Supply Constraints** → `SC`
 
-**Computation**
+##### Computation
 
 * For each pillar: `pillar_index = percentile_rank(component_1..n within peer group, weights)`.
 * **Aker Fit**:
@@ -274,13 +272,13 @@ A saved set of **user overrides** and **data vintages**.
 
 #### 6.4.2 Deal Quality (0–100)
 
-**Subcomponents**
+##### Subcomponents
 
 * **Returns (R):** stabilized yield‑on‑cost (YoC), 5‑yr levered IRR band, DSCR proxy @ UW rate.
 * **Risk (K):** hazard penalties (flood/wildfire/seismic/winter), insurance/OpEx headwinds, supply pressure, rent‑to‑income safety.
 * **Data Confidence (C):** penalty for stale/missing data.
 
-**Computation**
+##### Computation
 
 * Normalize each R metric to a 0–100 subscore (mapping tables below).
 * Apply **downward adjustments** for K and C (penalties are monotonic, bounded).
@@ -307,7 +305,7 @@ Defaults: `w_yoc=0.45, w_irr=0.35, w_dscr=0.20`.
 
 ### 6.5 Valuation Engine
 
-**Inputs**
+#### Inputs
 
 * Unit mix & current/target rent (user).
 * Market context: `zori_level`, `zori_yoy`, `rent_to_income`, `msa_jobs_t12`, `permits_5plus_per_1k_hh_t12`.
@@ -327,18 +325,19 @@ Defaults: `w_yoc=0.45, w_irr=0.35, w_dscr=0.20`.
 * **Base OpEx**: user value, adjusted by simple scalars:
 
   * **Utilities scaler**: linear function of HDD/CDD vs U.S. median.
-  * **Snow/ice line**: if winter events high, add fixed $/unit/year.
-  * **Insurance**:
+* **Snow/ice line**: if winter events high, add fixed $/unit/year.
+* **Insurance**:
 
-    * `in_sfha` → add **flood** premium from rule‑of‑thumb band.
-    * `wildfire_risk_percentile` top quartile → property insurance uplift (banded).
-    * **Seismic** screen high → modest uplift and contingency line.
+  * `in_sfha` → add **flood** premium from rule-of-thumb band.
+  * `wildfire_risk_percentile` top quartile → property insurance uplift (banded).
+  * **Seismic** screen high → modest uplift and contingency line.
+* **Ops provenance**: utilities/broadband/zoning feature outputs emit provenance metadata (source id + `as_of`) for downstream manifests and UI tooltips.
 
 #### 6.5.3 Capex & Contingencies
 
-* **User plan**: value‑add scope by bucket (unit interiors, exterior/common, systems).
+* **User plan**: value-add scope by bucket (unit interiors, exterior/common, systems).
 * **Hazard contingencies**: additive % reserve where warranted (e.g., flood/seismic context).
-* **Timing**: simple schedule across years 0–3 for value‑add; exit capex reserve for systems replacement (optional).
+* **Timing**: simple schedule across years 0–3 for value-add (default weights **60%/30%/10%** with overrides allowed); exit capex reserve for systems replacement (optional).
 
 #### 6.5.4 Quick Income Approach & DCF
 

@@ -1,4 +1,7 @@
+# Tasks: add-aker-fit-scoring
+
 ## 1. Implementation
+
 - [x] 1.1 Add scoring/aker_fit.py with pure function(s) and Pandera validation.
 - [x] 1.2 Update place_features assembly to call Aker Fit scorer.
 - [x] 1.3 Unit tests: weight handling, missing pillars, clamping, determinism.

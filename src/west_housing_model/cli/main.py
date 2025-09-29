@@ -235,8 +235,10 @@ def _run_features(args: argparse.Namespace) -> int:
         )
     if args.ops is not None:
         ops_df = _load_csv(args.ops)
-        rows = [
-            build_ops_features(
+        ops_frames: list[pd.DataFrame] = []
+        ops_provenance: list[dict[str, Any]] = []
+        for row in ops_df.to_dict(orient="records"):
+            frame, provenance = build_ops_features(
                 property_id=row["property_id"],
                 as_of=pd.to_datetime(row["as_of"]),
                 eia_state=row.get("eia_state"),
@@ -245,16 +247,29 @@ def _run_features(args: argparse.Namespace) -> int:
                 zoning_context_note=row.get("zoning_context_note"),
                 hud_fmr_2br=row.get("hud_fmr_2br"),
             )
-            for row in ops_df.to_dict(orient="records")
-        ]
-        if rows:
-            pd.concat(rows, ignore_index=True).to_parquet(
+            ops_frames.append(frame)
+            ops_provenance.append(
+                {
+                    "property_id": row.get("property_id"),
+                    "provenance": provenance,
+                }
+            )
+        if ops_frames:
+            pd.concat(ops_frames, ignore_index=True).to_parquet(
                 output_dir / "ops_features.parquet", index=False
             )
+            (output_dir / "ops_features_provenance.json").write_text(
+                json.dumps(ops_provenance, default=str, indent=2)
+            )
+    else:
+        ops_provenance = []
 
     info(ctx, "features-complete", output=str(output_dir), weights=weight_snapshot)
     if args.json:
-        print(json.dumps({"action": "features", "output": str(output_dir)}))
+        payload: Dict[str, Any] = {"action": "features", "output": str(output_dir)}
+        if ops_provenance:
+            payload["ops_provenance"] = str(output_dir / "ops_features_provenance.json")
+        print(json.dumps(payload, default=str))
     else:
         print(f"Feature artifacts written to {output_dir}")
     return 0
@@ -301,21 +316,29 @@ def _run_render(args: argparse.Namespace) -> int:
 
 def build_parser() -> argparse.ArgumentParser:
     configure()
-    parser = argparse.ArgumentParser(prog="west-housing-model", description="Developer utilities")
-    parser.add_argument("--json", action="store_true", help="Emit JSON responses")
+    json_parent = argparse.ArgumentParser(add_help=False)
+    json_parent.add_argument("--json", action="store_true", help="Emit JSON responses")
+
+    parser = argparse.ArgumentParser(
+        prog="west-housing-model", description="Developer utilities", parents=[json_parent]
+    )
     sub = parser.add_subparsers(dest="command", required=True)
 
-    refresh_p = sub.add_parser("refresh", help="Warm connector cache")
+    refresh_p = sub.add_parser("refresh", help="Warm connector cache", parents=[json_parent])
     refresh_p.add_argument("source_id")
     refresh_p.add_argument("--param", action="append", default=[])
     refresh_p.add_argument("--offline", action="store_true")
     refresh_p.set_defaults(func=_run_refresh)
 
-    validate_p = sub.add_parser("validate", help="List registered connectors")
+    validate_p = sub.add_parser(
+        "validate", help="List registered connectors", parents=[json_parent]
+    )
     validate_p.add_argument("--offline", action="store_true")
     validate_p.set_defaults(func=_run_validate)
 
-    features_p = sub.add_parser("features", help="Build features from CSV inputs")
+    features_p = sub.add_parser(
+        "features", help="Build features from CSV inputs", parents=[json_parent]
+    )
     features_p.add_argument("--type", choices=["site", "place"], default=None)
     features_p.add_argument("--base")
     features_p.add_argument("--hazards")
@@ -328,7 +351,9 @@ def build_parser() -> argparse.ArgumentParser:
     features_p.add_argument("--output", required=True)
     features_p.set_defaults(func=_run_features)
 
-    render_p = sub.add_parser("render", help="Render valuation outputs from a scenario JSON")
+    render_p = sub.add_parser(
+        "render", help="Render valuation outputs from a scenario JSON", parents=[json_parent]
+    )
     render_p.add_argument("scenario")
     render_p.add_argument("--output")
     render_p.set_defaults(func=_run_render)

@@ -1,4 +1,4 @@
-## 1. Implementation
+# 1. Implementation
 
 - [x] 1.1 Define valuation input/output contracts and Pandera schemas
 - [x] 1.2 Implement rent baseline module (ZORI baseline + UC uplift + guardrail)
@@ -11,15 +11,3 @@
 - [x] 1.9 CLI: `render` valuation for a sample Scenario JSON (local fixture)
 - [x] 1.10 Tests: unit per module; integration golden for a small scenario
 - [x] 1.11 Docs: update architecture & rulebook references; add mapping tables
-
-## 1. Implementation
-
-- [x] 1.1 Define contracts & schemas for valuation inputs/outputs
-- [x] 1.2 Implement rent baseline + growth modules
-- [x] 1.3 Implement OpEx & insurance adjustment module
-- [x] 1.4 Implement capex handling module
-- [x] 1.5 Implement DCF + sensitivity grid module
-- [x] 1.6 Orchestrator that composes modules and validates IO
-- [x] 1.7 CLI: render valuation from a sample Scenario JSON
-- [x] 1.8 Tests: unit per module; integration golden for a small scenario
-- [x] 1.9 Docs: update architecture & rulebook references

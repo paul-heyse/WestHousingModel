@@ -3,7 +3,7 @@ import pandas as pd
 from west_housing_model.valuation import ValuationInputs, run_valuation
 
 
-def test_run_valuation_basic_flow_validates():
+def test_run_valuation_basic_flow_validates() -> None:
     inputs = ValuationInputs(
         scenario_id="scn-1",
         property_id="prop-1",

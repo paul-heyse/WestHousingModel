@@ -1,0 +1,8 @@
+[
+  {
+    "place_id": "denver",
+    "public_land_acres_30min": 950.0,
+    "observed_at": "2025-02-01",
+    "source_id": "connector.pad_us"
+  }
+]
