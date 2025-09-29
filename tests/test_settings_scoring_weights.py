@@ -29,5 +29,3 @@ def test_returns_weights_defaults_and_normalization(monkeypatch) -> None:
     rw2 = get_returns_weights()
     assert abs(rw2.yoy_yoc + rw2.irr_5yr + rw2.dscr - 1.0) < 1e-9
     assert rw2.yoy_yoc >= rw2.irr_5yr >= rw2.dscr
-
-

@@ -3,7 +3,6 @@ from __future__ import annotations
 from datetime import datetime
 
 import pandas as pd
-
 from west_housing_model.data.connectors import make_census_acs_connector
 from west_housing_model.data.repository import (
     STATUS_FRESH,

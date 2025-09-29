@@ -4,7 +4,6 @@ import json
 from pathlib import Path
 
 import pandas as pd
-
 from west_housing_model.data.connectors import callable_connector
 from west_housing_model.data.repository import (
     STATUS_REFRESHED,
@@ -52,4 +51,3 @@ def test_repository_writes_failure_log_and_returns_stale(tmp_path: Path, monkeyp
     data = json.loads(logs[-1].read_text())
     assert data.get("source_id") == "connector.place_context"
     assert "correlation_id" in data
-

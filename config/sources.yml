@@ -147,5 +147,3 @@ sources:
     license: public
     rate_limit: "none"
     notes: "USGS Elevation Point Query Service for elevation/slope context."
-
-

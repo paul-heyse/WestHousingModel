@@ -56,6 +56,3 @@ sources:
     license: public
     rate_limit: "none"
     notes: "Self-hosted OSRM matrix/table; used for proximities and access metrics."
-
-
-

@@ -1,5 +1,4 @@
 import pandas as pd
-
 from west_housing_model.valuation import ValuationInputs, run_valuation
 
 

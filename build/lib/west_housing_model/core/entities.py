@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 from datetime import date
 from typing import Mapping, MutableMapping, Optional, Sequence
 
-from west_housing_model.core.enums import GeoLevel, HazardType, ScenarioType
+from west_housing_model.core.enums import GeoLevel, ScenarioType
 
 
 @dataclass(frozen=True)

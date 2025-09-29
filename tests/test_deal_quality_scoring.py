@@ -26,13 +26,22 @@ def test_hazard_and_supply_penalties() -> None:
 
 def test_affordability_and_data_confidence_penalties() -> None:
     base = compute_deal_quality(yoc=6.0, irr_5yr=12.0, dscr=1.25, rent_to_income=0.30)
-    penal = compute_deal_quality(yoc=6.0, irr_5yr=12.0, dscr=1.25, rent_to_income=0.40, missing_or_stale_features_count=3)
+    penal = compute_deal_quality(
+        yoc=6.0, irr_5yr=12.0, dscr=1.25, rent_to_income=0.40, missing_or_stale_features_count=3
+    )
     assert penal < base
 
 
 def test_clamping_bounds() -> None:
-    low = compute_deal_quality(yoc=5.5, irr_5yr=10.0, dscr=1.20, in_sfha=True, wildfire_risk_percentile=99, pga_10in50_g=0.3, permits_5plus_per_1k_hh_percentile=99, missing_or_stale_features_count=10)
+    low = compute_deal_quality(
+        yoc=5.5,
+        irr_5yr=10.0,
+        dscr=1.20,
+        in_sfha=True,
+        wildfire_risk_percentile=99,
+        pga_10in50_g=0.3,
+        permits_5plus_per_1k_hh_percentile=99,
+        missing_or_stale_features_count=10,
+    )
     high = compute_deal_quality(yoc=10.0, irr_5yr=30.0, dscr=3.0)
     assert low >= 0 and high <= 100
-
-

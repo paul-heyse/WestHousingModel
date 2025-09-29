@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import pandas as pd
-
 from west_housing_model.features.ops_features import build_ops_features
 
 

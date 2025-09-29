@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import pandas as pd
 import pytest
-
 from west_housing_model.core.exceptions import SchemaError
 from west_housing_model.data.catalog import validate_table
 

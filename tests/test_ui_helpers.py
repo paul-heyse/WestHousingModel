@@ -1,5 +1,4 @@
 import pandas as pd
-
 from west_housing_model.ui import (
     SPEC_VERSION,
     build_manifest,
@@ -16,7 +15,10 @@ def test_manifest_and_filenames():
     assert manifest["as_of"] == "2025-09"
     assert manifest["sources"]["census_acs"] == "2023-12"
     assert deterministic_export_filename("csv", "scn1", "2025-09") == "valuation-scn1-2025-09.csv"
-    assert deterministic_export_filename("pdf", "scn1", "2025-09") == "valuation-scn1-2025-09-onepager.pdf"
+    assert (
+        deterministic_export_filename("pdf", "scn1", "2025-09")
+        == "valuation-scn1-2025-09-onepager.pdf"
+    )
 
 
 def test_choose_manifest_locked_and_unlocked():
@@ -54,5 +56,3 @@ def test_exporters_embed_manifest(tmp_path):
     assert b"source_manifest" in csv_bytes
     pdf_bytes = export_pdf_onepager("Summary", manifest=manifest)
     assert b"Sources & Vintages" in pdf_bytes
-
-

@@ -7,7 +7,9 @@ from typing import Mapping
 from west_housing_model.core.entities import Property, Scenario
 
 
-def score_deal(property_: Property, scenario: Scenario) -> Mapping[str, float]:  # pragma: no cover - stub
+def score_deal(
+    property_: Property, scenario: Scenario
+) -> Mapping[str, float]:  # pragma: no cover - stub
     """Placeholder for Deal Quality scoring implementation."""
 
     return {"deal_quality": 0.0}

@@ -1,5 +1,4 @@
 import pandas as pd
-
 from west_housing_model.features.site_features import (
     build_site_features_from_components,
     extract_provenance,

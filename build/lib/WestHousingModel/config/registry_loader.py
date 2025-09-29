@@ -8,7 +8,6 @@ import yaml  # type: ignore[import-untyped]
 
 from WestHousingModel.core.exceptions import RegistryError
 
-
 _REQUIRED_FIELDS: Tuple[str, ...] = (
     "id",
     "enabled",
@@ -57,7 +56,9 @@ def _load_yaml(path: Path) -> Dict[str, Any]:
         raise RegistryError(f"Failed to parse YAML: {path}: {exc}") from exc
 
 
-def _merge_sources(base: List[Dict[str, Any]], overlay: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+def _merge_sources(
+    base: List[Dict[str, Any]], overlay: List[Dict[str, Any]]
+) -> List[Dict[str, Any]]:
     by_id: Dict[str, Dict[str, Any]] = {}
     for s in base:
         if not isinstance(s, dict):
@@ -99,7 +100,9 @@ def _validate_source(raw: Dict[str, Any], origin: str) -> SourceSpec:
     geo = raw["geography"]
     cad = raw["cadence"]
     if geo not in _GEO_ALLOWED:
-        raise RegistryError(f"Source '{sid}': invalid geography '{geo}' (allowed: {sorted(_GEO_ALLOWED)})")
+        raise RegistryError(
+            f"Source '{sid}': invalid geography '{geo}' (allowed: {sorted(_GEO_ALLOWED)})"
+        )
     if cad not in _CADENCE_ALLOWED:
         raise RegistryError(
             f"Source '{sid}': invalid cadence '{cad}' (allowed: {sorted(_CADENCE_ALLOWED)})"
@@ -130,7 +133,10 @@ def _validate_source(raw: Dict[str, Any], origin: str) -> SourceSpec:
     )
 
 
-def load_registry(base_path: Path | str = "config/sources.yml", supplement_path: Path | str = "config/sources_supplement.yml") -> List[SourceSpec]:
+def load_registry(
+    base_path: Path | str = "config/sources.yml",
+    supplement_path: Path | str = "config/sources_supplement.yml",
+) -> List[SourceSpec]:
     base_p = Path(base_path)
     sup_p = Path(supplement_path)
     base = _load_yaml(base_p)["sources"]
@@ -162,5 +168,3 @@ def load_data_dictionary(registry: Optional[List[SourceSpec]] = None) -> List[Di
         }
         for s in registry
     ]
-
-

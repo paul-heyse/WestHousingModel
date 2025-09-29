@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import pandas as pd
-
 from west_housing_model.scoring.aker_fit import compute_aker_fit
 
 

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import pandas as pd
-
 from west_housing_model.features.place_features import (
     assemble_place_features,
     build_place_features_from_components,
