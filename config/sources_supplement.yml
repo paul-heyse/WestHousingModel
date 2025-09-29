@@ -1,0 +1,61 @@
+# Source Registry (supplement)
+#
+# Use this file to add optional/commercial feeds or local overrides. Merge order is:
+#   1) sources.yml (base)
+#   2) sources_supplement.yml (this file) — overrides by `id` (last-one-wins per field)
+
+sources:
+  - id: routes_service
+    enabled: false
+    endpoint: "https://api.openrouteservice.org"
+    geography: point
+    cadence: as-updated
+    cache_ttl_days: 0
+    license: "OpenRouteService terms"
+    rate_limit: "40/min"
+    auth_key_name: ORS_API_KEY
+    notes: "Isochrones/routing for access metrics. Requires API key; disabled by default."
+
+  - id: osm_overpass
+    enabled: false
+    endpoint: "https://overpass-api.de/api/interpreter"
+    geography: point
+    cadence: monthly
+    cache_ttl_days: 60
+    license: ODbL
+    rate_limit: "1/s"
+    notes: "OSM POIs for everyday amenities. Heavier queries; enable as needed."
+
+  - id: apartment_list
+    enabled: false
+    endpoint: "https://data.apartmentlist.com"
+    geography: msa
+    cadence: monthly
+    cache_ttl_days: 60
+    license: restricted
+    rate_limit: "none"
+    notes: "Optional rent series; license restrictions may apply."
+
+  - id: openrouteservice
+    enabled: false
+    endpoint: "https://api.openrouteservice.org"
+    geography: point
+    cadence: as-updated
+    cache_ttl_days: 0
+    license: "OpenRouteService terms"
+    rate_limit: "40/min"
+    auth_key_name: ORS_API_KEY
+    notes: "Hosted isochrones for convenience; prefer self-hosted OSRM/Valhalla for heavy use."
+
+  - id: osrm
+    enabled: true
+    endpoint: "http://localhost:5000"
+    geography: point
+    cadence: as-updated
+    cache_ttl_days: 0
+    license: public
+    rate_limit: "none"
+    notes: "Self-hosted OSRM matrix/table; used for proximities and access metrics."
+
+
+

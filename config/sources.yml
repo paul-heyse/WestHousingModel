@@ -1,0 +1,151 @@
+# Source Registry (base)
+#
+# This file lists public/standard sources used by the system. Secrets are NOT stored here.
+# Use `config/sources_supplement.yml` to add overrides or optional sources.
+
+sources:
+  - id: bls_timeseries
+    enabled: true
+    endpoint: "https://download.bls.gov/pub/time.series/"
+    geography: msa           # one of: msa | county | tract | point
+    cadence: monthly         # one of: monthly | quarterly | annual | as-updated
+    cache_ttl_days: 60
+    license: public
+    rate_limit: "none"
+    auth_key_name: BLS_API_KEY
+    notes: "Jobs momentum (CES/LAUS). Use API or cached CSV extracts. TTL 60d."
+
+  - id: census_acs
+    enabled: true
+    endpoint: "https://api.census.gov/data/"
+    geography: tract         # one of: msa | county | tract | point
+    cadence: annual          # one of: monthly | quarterly | annual | as-updated
+    cache_ttl_days: 400
+    license: public
+    rate_limit: "10/s"
+    auth_key_name: CENSUS_API_KEY
+    notes: "ACS 1yr/5yr income & rent burden tables."
+
+  - id: census_bps
+    enabled: true
+    endpoint: "https://www2.census.gov/econ/bps/"
+    geography: county        # one of: msa | county | tract | point
+    cadence: monthly         # one of: monthly | quarterly | annual | as-updated
+    cache_ttl_days: 60
+    license: public
+    rate_limit: "none"
+    notes: "Building Permits Survey (5+ units). Supply pressure proxy."
+
+  - id: zillow_research
+    enabled: true
+    endpoint: "https://files.zillowstatic.com/research/public_csvs/zori/"
+    geography: msa           # one of: msa | county | tract | point
+    cadence: monthly         # one of: monthly | quarterly | annual | as-updated
+    cache_ttl_days: 60
+    license: "Zillow Research terms"
+    rate_limit: "none"
+    notes: "ZORI rent level/momentum at ZIP/MSA aggregates."
+
+  - id: fema_nfhl
+    enabled: true
+    endpoint: "https://hazards.fema.gov/nfhl/rest/services/public/NFHL/MapServer"
+    geography: point         # one of: msa | county | tract | point
+    cadence: as-updated      # one of: monthly | quarterly | annual | as-updated
+    cache_ttl_days: 365
+    license: public
+    rate_limit: "2/s"
+    notes: "Flood zones (SFHA, zone). Map service subject to change."
+
+  - id: usfs_wildfire_risk
+    enabled: true
+    endpoint: "https://data-usfs.hub.arcgis.com"
+    geography: tract         # percentile rolled up at tract/block group level
+    cadence: annual
+    cache_ttl_days: 365
+    license: public
+    rate_limit: "none"
+    notes: "USFS Wildfire Risk to Communities (percentile)."
+
+  - id: usgs_seismic_designmaps
+    enabled: true
+    endpoint: "https://earthquake.usgs.gov/ws/designmaps"
+    geography: point
+    cadence: as-updated
+    cache_ttl_days: 365
+    license: public
+    rate_limit: "none"
+    notes: "USGS ASCE-7 design maps (PGA screen)."
+
+  - id: noaa_storm_events
+    enabled: true
+    endpoint: "https://www.ncei.noaa.gov/stormevents"
+    geography: county
+    cadence: monthly
+    cache_ttl_days: 180
+    license: public
+    rate_limit: "none"
+    notes: "NCEI Storm Events; 10-yr winter events count."
+
+  - id: pad_us
+    enabled: true
+    endpoint: "https://www.usgs.gov/programs/gap-analysis-project/science/pad-us-data-download"
+    geography: point         # used for drive-time polygon overlays
+    cadence: annual
+    cache_ttl_days: 365
+    license: public
+    rate_limit: "none"
+    notes: "Protected Areas Database (PAD-US) for outdoor access acres."
+
+  - id: fcc_bdc
+    enabled: true
+    endpoint: "https://broadbandmap.fcc.gov/ArcGIS/rest/services/BDC/FBD_MAP/MapServer"
+    geography: tract         # aggregated from block to tract/place context
+    cadence: as-updated
+    cache_ttl_days: 240
+    license: public
+    rate_limit: "none"
+    notes: "FCC Broadband Data Collection (fixed availability)."
+
+  - id: hud_fmr
+    enabled: true
+    endpoint: "https://www.huduser.gov/hudapi/public/fmr"
+    geography: county
+    cadence: annual
+    cache_ttl_days: 400
+    license: public
+    rate_limit: "none"
+    auth_key_name: HUD_API_KEY
+    notes: "HUD Fair Market Rents reference. Requires HUD API key."
+
+  - id: eia_v2
+    enabled: true
+    endpoint: "https://api.eia.gov/v2"
+    geography: state
+    cadence: monthly
+    cache_ttl_days: 120
+    license: public
+    rate_limit: "none"
+    auth_key_name: EIA_API_KEY
+    notes: "EIA retail electricity/gas (RES sector) for utility rate context."
+
+  - id: usfs_trails
+    enabled: true
+    endpoint: "https://data-usfs.hub.arcgis.com"
+    geography: point
+    cadence: annual
+    cache_ttl_days: 365
+    license: public
+    rate_limit: "none"
+    notes: "USFS National Forest System Trails; used to find nearest trailheads."
+
+  - id: usgs_epqs
+    enabled: true
+    endpoint: "https://apps.nationalmap.gov/epqs/"
+    geography: point
+    cadence: as-updated
+    cache_ttl_days: 365
+    license: public
+    rate_limit: "none"
+    notes: "USGS Elevation Point Query Service for elevation/slope context."
+
+

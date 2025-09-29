@@ -1,0 +1,2586 @@
+categories:
+- key: sources
+  title: sources
+  description: ''
+  sources:
+  - id: accela_civic
+    name: Accela Civic Platform API (where available)
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://apis.accela.com/v4
+    api_url: null
+    docs: null
+    auth:
+      type: oauth2
+      grant: client_credentials
+      env:
+        client_id: ACCELA_CLIENT_ID
+        client_secret: ACCELA_CLIENT_SECRET
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: null
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: records_search
+      method: GET
+      url_template: /records?module=Building&offset=0&limit=100
+      example: https://apis.accela.com/v4/records?module=Building&limit=100
+    example_request: null
+    notes: null
+    extra:
+      enabled: false
+      docs_url: https://developer.accela.com/docs/api_reference/
+  - id: airnow
+    name: AirNow — Observations/Forecasts
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://www.airnowapi.org/aq
+    api_url: null
+    docs: null
+    auth:
+      type: api_key
+      in: query
+      param: API_KEY
+      env: AIRNOW_API_KEY
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: null
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: obs_by_latlon
+      method: GET
+      url_template: /observation/latLong/current/?format=application/json&latitude={lat}&longitude={lon}&distance=25
+      example: https://www.airnowapi.org/aq/observation/latLong/current/?format=application/json&latitude=43.618&longitude=-116.214&distance=25&API_KEY={KEY}
+    example_request: null
+    notes: null
+    extra:
+      enabled: false
+      docs_url: https://docs.airnowapi.org/
+  - id: apartment_list
+    name: Apartment List — Rent estimates CSV
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://www.apartmentlist.com/research/category/data-rent-estimates
+    api_url: null
+    docs: null
+    auth:
+      type: none
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: null
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: monthly_rent_csv
+      method: GET
+      url_template: '[manually select latest CSV link on page]'
+      example: https://static.apartmentlist.com/research/city_rent_estimates.csv
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://www.apartmentlist.com/research/category/data-rent-estimates
+  - id: arcgis_feature
+    name: ArcGIS Feature Service (generic adapter)
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://{host}/arcgis/rest/services
+    api_url: null
+    docs: null
+    auth:
+      type: none
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: null
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: query_geojson
+      method: GET
+      url_template: /{service_path}/FeatureServer/{layer}/query?where=1=1&outFields=*&f=geojson
+      example: https://maps.udot.utah.gov/arcgis01/rest/services/ROW/Water_Rights/MapServer/0/query?where=1=1&outFields=*&f=geojson
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://developers.arcgis.com/rest/services-reference/enterprise/feature-service/
+  - id: bea_regional
+    name: BEA API — Regional (GDP/PI)
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://apps.bea.gov/api/data
+    api_url: null
+    docs: null
+    auth:
+      type: api_key
+      in: query
+      param: UserID
+      env: BEA_API_KEY
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: Quarterly/Annual
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: personal_income_msa
+      method: GET
+      url_template: ?UserID={key}&method=GetData&DataSetName=Regional&TableName=CAINC1&GeoFIPS=MSA&Year=ALL
+      example: https://apps.bea.gov/api/data?UserID={KEY}&method=GetData&DataSetName=Regional&TableName=CAINC1&GeoFIPS=MSA&Year=ALL
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://apps.bea.gov/api/signup/
+      datasets_written:
+      - bea_income
+      - bea_gdp
+  - id: bls_timeseries
+    name: BLS Public Data API v2 (CES/LAUS etc.)
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://api.bls.gov/publicAPI/v2/timeseries/data
+    api_url: null
+    docs: null
+    auth:
+      type: none
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: Monthly
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: series_post
+      method: POST
+      url_template: ''
+      example: 'POST https://api.bls.gov/publicAPI/v2/timeseries/data/  body: {"seriesid":["LAUCN040010000000005"],"startyear":"2022","endyear":"2025"}'
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://www.bls.gov/developers/home.htm
+      rate_limits: No key required; keep payloads small.
+      datasets_written:
+      - laus_unemp
+      - ces_jobs
+  - id: bls_qcew
+    name: BLS QCEW Open Data (CSV API)
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://data.bls.gov/cew/data/api
+    api_url: null
+    docs: null
+    auth:
+      type: none
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: Quarterly
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: area_slice
+      method: GET
+      url_template: /{year}/{quarter}/area/{area_code}.csv
+      example: https://data.bls.gov/cew/data/api/2024/1/area/08001.csv
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://www.bls.gov/cew/additional-resources/open-data/
+      rate_limits: Static CDN; chunk pulls.
+      datasets_written:
+      - qcew_naics
+      - qcew_wages
+  - id: cdfi_ozones
+    name: CDFI Fund Qualified Opportunity Zones (QOZ)
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://hudgis-hud.opendata.arcgis.com
+    api_url: null
+    docs: null
+    auth:
+      type: none
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: Static (designated 2018)
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: qoz_features
+      method: GET
+      url_template: /datasets/ef143299845841f8abb95969c01f88b5_13/FeatureServer/0/query?where=1%3D1&outFields=*&f=json
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://www.cdfifund.gov/opportunity-zones
+      datasets_written:
+      - opportunity_zones
+  - id: census_bps
+    name: Census Building Permits Survey (BPS) — timeseries
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://api.census.gov/data/timeseries/bps
+    api_url: null
+    docs: null
+    auth:
+      type: api_key_optional
+      in: query
+      param: key
+      env: CENSUS_API_KEY
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: Monthly
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: cbsa_permits
+      method: GET
+      url_template: ?get=month,year,permits,geo&time={time_expr}&geo={cbsa_code}
+      example: https://api.census.gov/data/timeseries/bps?get=month,year,permits&time=from%202023-01%20to%202025-08
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://www.census.gov/permits
+      datasets_written:
+      - bps_permits
+  - id: census_bfs
+    name: Census Business Formation Statistics (EITS/BFS)
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://api.census.gov/data/timeseries/eits/bfs
+    api_url: null
+    docs: null
+    auth:
+      type: api_key_optional
+      in: query
+      param: key
+      env: CENSUS_API_KEY
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: Monthly
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: national_series
+      method: GET
+      url_template: ?get=cell_value,data_type_code,time&time={time_expr}&seasonally_adj={U_or_S}
+      example: https://api.census.gov/data/timeseries/eits/bfs?get=cell_value,data_type_code,time&time=from%202022-01%20to%202025-08&seasonally_adj=U
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://api.census.gov/data/timeseries/eits/bfs.html
+      datasets_written:
+      - bfs_apps
+  - id: census_cbp
+    name: Census County Business Patterns (CBP) API
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://api.census.gov/data
+    api_url: null
+    docs: null
+    auth:
+      type: none
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: Annual
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: cbp_year
+      method: GET
+      url_template: /{year}/cbp?get=EMP,ESTAB&for=county:*&in=state:{state_fips}
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://www.census.gov/data/developers/data-sets/cbp-nonemp-zbp.html
+      datasets_written:
+      - cbp_employment
+  - id: hmda_public_api
+    name: CFPB HMDA Public API
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://ffiec.cfpb.gov/api/public
+    api_url: null
+    docs: null
+    auth:
+      type: none
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: Annual
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: aggregations
+      method: GET
+      url_template: /hmda/aggregate?year={year}&state={state_abbr}&msamd={msa_code}
+    - name: filers
+      method: GET
+      url_template: /filers?year={year}&state={state_abbr}
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://ffiec.cfpb.gov/documentation/public-api
+      datasets_written:
+      - hmda_agg
+  - id: co_hydrobase
+    name: Colorado DWR — HydroBase REST
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://dwr.state.co.us/Rest/GET/api/v2
+    api_url: null
+    docs: null
+    auth:
+      type: api_key_optional
+      in: query
+      param: apiKey
+      env: CO_DWR_API_KEY
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: null
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: structures
+      method: GET
+      url_template: /structures/structure/?format=json&waterDistrict={wd}&division={div}&pageSize=2000
+      example: https://dwr.state.co.us/Rest/GET/api/v2/structures/structure/?format=json&division=1&pageSize=2000
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://dwr.state.co.us/Rest/GET/help
+  - id: nrel_afdc
+    name: DOE/NREL Alternative Fuel Stations API
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://developer.nrel.gov/api/alt-fuel-stations/v1
+    api_url: null
+    docs: null
+    auth:
+      type: query
+      param: api_key
+      env: NREL_API_KEY
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: Daily
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: nearest
+      method: GET
+      url_template: /nearest.json?latitude={lat}&longitude={lon}&radius=50&fuel_type=ELEC
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://developer.nrel.gov/docs/transportation/alt-fuel-stations-v1/
+      datasets_written:
+      - ev_stations
+  - id: eia_v2
+    name: EIA API v2
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://api.eia.gov/v2
+    api_url: null
+    docs: null
+    auth:
+      type: api_key
+      in: query
+      param: api_key
+      env: EIA_API_KEY
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: null
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: retail_prices
+      method: GET
+      url_template: /electricity/retail-sales/data/?facets[stateid][]={SS}&facets[sectorid][]=RES&frequency=monthly&start={YYYY-MM}
+      example: https://api.eia.gov/v2/electricity/retail-sales/data/?api_key={KEY}&facets[stateid][]=ID&facets[sectorid][]=RES&frequency=monthly&start=2023-01
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://www.eia.gov/opendata/documentation.php
+  - id: epa_aqs
+    name: EPA Air Quality System (AQS) Data API v2
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://aqs.epa.gov/data/api
+    api_url: null
+    docs: null
+    auth:
+      type: api_key
+      in: query
+      param: email
+      env: AQS_EMAIL
+      extra:
+      - in: query
+        param: key
+        env: AQS_KEY
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: null
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: daily_by_county
+      method: GET
+      url_template: /dailyData/byCounty?param={code}&bdate={yyyymmdd}&edate={yyyymmdd}&state={ss}&county={ccc}
+      example: https://aqs.epa.gov/data/api/dailyData/byCounty?param=88101&bdate=20240101&edate=20241231&state=16&county=001&email={EMAIL}&key={KEY}
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://aqs.epa.gov/aqsweb/documents/data_api.html
+  - id: epa_echo
+    name: EPA ECHO — Facility REST Services
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://echodata.epa.gov/echo
+    api_url: null
+    docs: null
+    auth:
+      type: none
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: null
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: facility_search_water
+      method: GET
+      url_template: /rest/services/facilities/eff_rest_services.get_facilities?state_abbr={SS}&output=JSON
+      example: https://echodata.epa.gov/echo/rest/services/facilities/eff_rest_services.get_facilities?state_abbr=ID&output=JSON
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://echo.epa.gov/tools/web-services
+  - id: epa_ejscreen_bulk
+    name: EPA EJScreen (bulk CSV/Geodatabase mirror)
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://gaftp.epa.gov/EJScreen
+    api_url: null
+    docs: null
+    auth:
+      type: none
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: Annual
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: latest_zip
+      method: GET
+      url_template: /2024/2.30_July_useMe/EJScreen_2024_BG_StatePct_with_AS_CNMI_GU_VI.csv.zip
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://www.epa.gov/system/files/documents/2024-07/ejscreen-tech-doc-version-2-3.pdf
+      datasets_written:
+      - ejscreen_bg
+  - id: energystar_pmdx
+    name: EPA ENERGY STAR Portfolio Manager (Data Exchange)
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://portfoliomanager.energystar.gov/wstest
+    api_url: null
+    docs: null
+    auth:
+      type: basic
+      env_user: ENERGYSTAR_USER
+      env_password: ENERGYSTAR_PASSWORD
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: On demand
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: authenticate
+      method: GET
+      url_template: /account/authenticate
+    - name: get_property
+      method: GET
+      url_template: /property/{property_id}
+    example_request: null
+    notes: null
+    extra:
+      enabled: false
+      docs_url: https://portfoliomanager.energystar.gov/webservices/home
+      datasets_written:
+      - asset_energy
+  - id: epa_frs
+    name: EPA Facility Registry Service (FRS) API
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://frsqueryprd-api.epa.gov
+    api_url: null
+    docs: null
+    auth:
+      type: none
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: null
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: facilities
+      method: GET
+      url_template: /frs/api/1/Facilities?stateCode={SS}&out=JSON
+      example: https://frsqueryprd-api.epa.gov/frs/api/1/Facilities?stateCode=ID&out=JSON
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://www.epa.gov/frs/frs-api
+  - id: epa_sld
+    name: EPA Smart Location Database (SLD)
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://gis.ers.usda.gov/arcgis/rest/services
+    api_url: null
+    docs: null
+    auth:
+      type: none
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: Irregular (v3 latest)
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: feature_service
+      method: GET
+      url_template: http://gis.ers.usda.gov/arcgis/rest/services/SLD/MapServer/0/query?where=1%3D1&outFields=*&f=json
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://www.epa.gov/smartgrowth/smart-location-mapping
+      datasets_written:
+      - epa_sld_blockgroup
+  - id: faa_nasr_csv
+    name: FAA NASR (airport facilities) CSV releases
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://www.faa.gov/air_traffic/flight_info/aeronav/aero_data/NASR_Subscription
+    api_url: null
+    docs: null
+    auth:
+      type: none
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: Every 28 days
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: latest_release_page
+      method: GET
+      url_template: ''
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://www.faa.gov/air_traffic/flight_info/aeronav/aero_data/NASR_Subscription/
+      datasets_written:
+      - airports_nasr
+  - id: fbi_cde
+    name: FBI Crime Data Explorer API (NIBRS/SRS)
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://api.usa.gov/crime/fbi/sapi/api
+    api_url: null
+    docs: null
+    auth:
+      type: query
+      param: api_key
+      env: FBI_CDE_API_KEY
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: Annual
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: nibrs_state_counts
+      method: GET
+      url_template: /data/nibrs/{offense}/offense/count/states/{state_abbr}/offense/{offense}/year/{from_year}/{to_year}
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://crime-data-explorer.fr.cloud.gov/api
+      datasets_written:
+      - crime_nibrs
+  - id: fcc_vizmo
+    name: FCC Mobile Speed Test Crowdsourced API (vizmo)
+    category: sources
+    subcategory: null
+    type: null
+    base_url: http://vizmo.fcc.gov/api
+    api_url: null
+    docs: null
+    auth:
+      type: none
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: Weekly
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: tiles
+      method: GET
+      url_template: /tile?z={z}&x={x}&y={y}
+    - name: summary_by_bbox
+      method: GET
+      url_template: /summary?bbox={minx},{miny},{maxx},{maxy}
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://fcc.github.io/vizmo/docs/basics.html
+      datasets_written:
+      - broadband_mobile_speed
+  - id: fcc_bdc
+    name: FCC National Broadband Map (BDC) - public downloads & feature services
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://www.fcc.gov/BroadbandData/resources
+    api_url: null
+    docs: null
+    auth:
+      type: none
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: Semiannual
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: fixed_availability
+      method: GET
+      url_template: https://broadbandmap.fcc.gov/ArcGIS/rest/services/BDC/FBD_MAP/MapServer/0/query?where=1%3D1&outFields=*&f=json
+    - name: fabric_downloads
+      method: GET
+      url_template: https://www.fcc.gov/BroadbandData/resources
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://www.fcc.gov/BroadbandData/resources
+      datasets_written:
+      - broadband_fixed
+  - id: fred
+    name: Federal Reserve Economic Data (FRED) API
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://api.stlouisfed.org/fred
+    api_url: null
+    docs: null
+    auth:
+      type: query
+      param: api_key
+      env: FRED_API_KEY
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: Daily
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: series_observations
+      method: GET
+      url_template: /series/observations?series_id={series_id}&observation_start={start}&observation_end={end}&file_type=json
+    - name: category_series
+      method: GET
+      url_template: /category/series?category_id={category_id}&file_type=json
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://fred.stlouisfed.org/docs/api/fred/
+      datasets_written:
+      - macro_rates
+      - macro_indexes
+  - id: fema_nfhl
+    name: FEMA National Flood Hazard Layer (ArcGIS REST/WMS)
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://hazards.fema.gov/arcgis/rest/services/public/NFHL/MapServer
+    api_url: null
+    docs: null
+    auth:
+      type: none
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: null
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: flood_zones_query
+      method: GET
+      url_template: /{layer}/query?where=1=1&geometry={bbox}&geometryType=esriGeometryEnvelope&inSR=3857&spatialRel=esriSpatialRelIntersects&outFields=*&f=geojson
+      example: https://hazards.fema.gov/arcgis/rest/services/public/NFHL/MapServer/28/query?where=1=1&geometry=-12948628,4844840,-12895344,4898144&geometryType=esriGeometryEnvelope&inSR=3857&spatialRel=esriSpatialRelIntersects&outFields=*&f=geojson
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://hazards.fema.gov/femaportal/wps/portal/NFHLWMS
+  - id: fema_nri
+    name: FEMA National Risk Index (downloads)
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://hazards.fema.gov/nri/data-resources
+    api_url: null
+    docs: null
+    auth:
+      type: none
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: Annual
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: tracts_csv
+      method: GET
+      url_template: /#table-format-csv
+    - name: tracts_gdb
+      method: GET
+      url_template: /#geodatabase-format
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://hazards.fema.gov/nri/data-resources
+      datasets_written:
+      - nri_tract
+  - id: foursquare_places
+    name: Foursquare Places API — licensed
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://api.foursquare.com/v3
+    api_url: null
+    docs: null
+    auth:
+      type: api_key
+      in: header
+      header: Authorization
+      scheme: fsq3
+      env: FSQ_API_KEY
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: null
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: place_search
+      method: GET
+      url_template: /places/search?ll={lat},{lon}&query={q}&limit=50
+      example: https://api.foursquare.com/v3/places/search?ll=43.618,-116.214&query=coffee&limit=20
+    example_request: null
+    notes: null
+    extra:
+      enabled: false
+      docs_url: https://docs.foursquare.com/developer/reference/place-search
+  - id: fra_grade_crossings_api
+    name: FRA Grade Crossings & Safety Public API
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://safetydata.fra.dot.gov/MasterWebService/publicapi
+    api_url: null
+    docs: null
+    auth:
+      type: none
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: Monthly
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: crossing_inventory
+      method: GET
+      url_template: /CrossingInventory?format=json&StateCode={state_abbr}
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://safetydata.fra.dot.gov/MasterWebService/publicapi/
+      datasets_written:
+      - rail_crossings
+  - id: gbfs_generic
+    name: GBFS micromobility (system-specific root)
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://{provider_host}/gbfs.json
+    api_url: null
+    docs: null
+    auth:
+      type: none
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: Realtime (minutes)
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: discovery
+      method: GET
+      url_template: ''
+      example: https://gbfs.bcycle.com/bcycle_gbfs/gbfs.json
+    example_request: null
+    notes: null
+    extra:
+      enabled: false
+      docs_url: https://gbfs.org/documentation/reference/
+      datasets_written:
+      - gbfs_systems
+  - id: google_places
+    name: Google Places API (ratings/POIs) — licensed
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://places.googleapis.com/v1
+    api_url: null
+    docs: null
+    auth:
+      type: api_key
+      in: query
+      param: key
+      env: GOOGLE_MAPS_API_KEY
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: null
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: place_details
+      method: GET
+      url_template: https://maps.googleapis.com/maps/api/place/details/json?place_id={place_id}&fields=name,rating,user_ratings_total
+      example: https://maps.googleapis.com/maps/api/place/details/json?place_id=ChIJ…&fields=name,rating,user_ratings_total&key={KEY}
+    example_request: null
+    notes: null
+    extra:
+      enabled: false
+      docs_url: https://developers.google.com/maps/documentation/places/web-service/overview
+  - id: hud_chas
+    name: HUD — CHAS API
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://www.huduser.gov/hudapi/public/chas
+    api_url: null
+    docs: null
+    auth:
+      type: bearer
+      in: header
+      header: Authorization
+      scheme: Bearer
+      env: HUD_API_TOKEN
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: null
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: state_summary
+      method: GET
+      url_template: ?type=1&year={range}
+      example: https://www.huduser.gov/hudapi/public/chas?type=1&year=2016-2020
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://www.huduser.gov/portal/dataset/chas-api.html
+  - id: hud_fmr
+    name: HUD — Fair Market Rents API
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://www.huduser.gov/hudapi/public/fmr
+    api_url: null
+    docs: null
+    auth:
+      type: bearer
+      in: header
+      header: Authorization
+      scheme: Bearer
+      env: HUD_API_TOKEN
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: null
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: fmr_by_zip
+      method: GET
+      url_template: /fmr?year={yyyy}&zip_code={zip}
+      example: https://www.huduser.gov/hudapi/public/fmr/fmr?year=2025&zip_code=83702
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://www.huduser.gov/portal/dataset/fmr-api.html
+  - id: hud_il
+    name: HUD — Income Limits API
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://www.huduser.gov/hudapi/public/usps
+    api_url: null
+    docs: null
+    auth:
+      type: bearer
+      in: header
+      header: Authorization
+      scheme: Bearer
+      env: HUD_API_TOKEN
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: null
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: income_limits_by_geo
+      method: GET
+      url_template: ?type=il&year={yyyy}&query={state_or_county}
+      example: https://www.huduser.gov/hudapi/public/usps?type=il&year=2025&query=ID,Ada
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://www.huduser.gov/portal/dataset/fmr-api.html
+  - id: hud_usps_crosswalk
+    name: HUD–USPS ZIP Code Crosswalk (quarterly)
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://www.huduser.gov/portal/datasets/usps_crosswalk.html
+    api_url: null
+    docs: null
+    auth:
+      type: none
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: Quarterly
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: download_page
+      method: GET
+      url_template: ''
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://www.huduser.gov/portal/datasets/usps_crosswalk.html
+      datasets_written:
+      - zip_crosswalk
+  - id: idwr_arcgis
+    name: Idaho Department of Water Resources — ArcGIS Services
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://gis.idwr.idaho.gov/hosting/rest/services
+    api_url: null
+    docs: null
+    auth:
+      type: none
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: null
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: places_of_use
+      method: GET
+      url_template: /allocation/WaterRightPous/FeatureServer/0/query?where=1=1&f=geojson&outFields=*
+      example: https://gis.idwr.idaho.gov/hosting/rest/services/allocation/WaterRightPous/FeatureServer/0/query?where=1=1&f=geojson&outFields=*
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://data-idwr.hub.arcgis.com/
+  - id: landfire_wms_wcs
+    name: LANDFIRE — WMS/WCS (fuels/vegetation)
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://landfire.cr.usgs.gov/arcgis/services
+    api_url: null
+    docs: null
+    auth:
+      type: none
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: null
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: wms_getmap_template
+      method: GET
+      url_template: https://landfire.cr.usgs.gov/arcgis/services/US_200/MapServer/WMSServer?service=WMS&request=GetMap&layers=0&bbox={bbox}&crs=EPSG:3857&format=image/png&width=1024&height=1024
+      example: https://landfire.cr.usgs.gov/arcgis/services/US_200/MapServer/WMSServer?service=WMS&request=GetMap&layers=0&bbox=-12948628,4844840,-12895344,4898144&crs=EPSG:3857&width=1024&height=1024&format=image/png
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://www.landfire.gov/data/lf_wcs_wms
+  - id: lehd_lodes
+    name: LEHD LODES v8 (HTTP directory)
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://lehd.ces.census.gov/data/lodes/LODES8
+    api_url: null
+    docs: null
+    auth:
+      type: none
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: Irregular by state; treat as static per release
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: wac_state
+      method: GET
+      url_template: /{state}/{state}_wac_S000_JT00_{year}.csv.gz
+      example: https://lehd.ces.census.gov/data/lodes/LODES8/co/co_wac_S000_JT00_2021.csv.gz
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://lehd.ces.census.gov/doc/help/onthemap/LODESTechDoc.pdf
+      datasets_written:
+      - lodes_wac
+      - lodes_rac
+      - lodes_od
+  - id: mapbox_geocoding
+    name: Mapbox Geocoding API
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://api.mapbox.com/geocoding/v5/mapbox.places
+    api_url: null
+    docs: null
+    auth:
+      type: query
+      param: access_token
+      env: MAPBOX_TOKEN
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: On demand
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: forward
+      method: GET
+      url_template: /{query}.json?proximity={lon},{lat}&limit=10&types=address,poi
+    - name: reverse
+      method: GET
+      url_template: /{lon},{lat}.json?limit=10
+    example_request: null
+    notes: null
+    extra:
+      enabled: false
+      docs_url: https://docs.mapbox.com/api/search/geocoding/
+      datasets_written:
+      - geocode_mapbox
+  - id: microsoft_buildings
+    name: Microsoft Global Building Footprints
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://planetarycomputer.microsoft.com/dataset/ms-buildings
+    api_url: null
+    docs: null
+    auth:
+      type: none
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: Irregular
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: download_index
+      method: GET
+      url_template: https://github.com/microsoft/GlobalMLBuildingFootprints
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://github.com/microsoft/GlobalMLBuildingFootprints
+      datasets_written:
+      - building_footprints
+  - id: nps_api
+    name: National Park Service API
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://developer.nps.gov/api/v1
+    api_url: null
+    docs: null
+    auth:
+      type: header
+      header: X-Api-Key
+      env: NPS_API_KEY
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: Weekly
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: parks
+      method: GET
+      url_template: /parks?stateCode={state_abbr}&limit=50&start={start}
+    - name: campgrounds
+      method: GET
+      url_template: /campgrounds?parkCode={park_code}
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://www.nps.gov/subjects/developer/api-documentation.htm
+      datasets_written:
+      - parks
+      - campgrounds
+  - id: national_zoning_atlas
+    name: National Zoning Atlas (per-state ArcGIS feature services)
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://www.zoningatlas.org
+    api_url: null
+    docs: null
+    auth:
+      type: none
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: Irregular (state-by-state)
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: state_layer_template
+      method: GET
+      url_template: https://services.arcgis.com/{org}/ArcGIS/rest/services/{state}_ZoningAtlas/FeatureServer/0/query?where=1%3D1&outFields=*&f=json
+    example_request: null
+    notes: null
+    extra:
+      enabled: false
+      docs_url: https://www.zoningatlas.org/atlas
+      datasets_written:
+      - zoning_features
+  - id: nih_reporter
+    name: NIH RePORTER Projects API
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://api.reporter.nih.gov/v2/projects
+    api_url: null
+    docs: null
+    auth:
+      type: none
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: Daily
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: search
+      method: POST
+      url_template: /search
+    - name: download
+      method: POST
+      url_template: /download
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://api.reporter.nih.gov/
+      datasets_written:
+      - nih_awards
+  - id: noaa_hms_smoke
+    name: NOAA Hazard Mapping System — Smoke (ArcGIS)
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://www.arcgis.com/sharing/rest/content/items/288af70caeae48c99c2fb35b0e9746ba/data
+    api_url: null
+    docs: null
+    auth:
+      type: none
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: null
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: layer_geojson
+      method: GET
+      url_template: ''
+      example: https://www.arcgis.com/sharing/rest/content/items/288af70caeae48c99c2fb35b0e9746ba/data
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://www.ospo.noaa.gov/products/land/hms.html
+  - id: noaa_storm_events
+    name: NOAA NCEI Storm Events (bulk CSV)
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://www.ncei.noaa.gov/stormevents
+    api_url: null
+    docs: null
+    auth:
+      type: none
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: Monthly
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: bulk_csv
+      method: GET
+      url_template: /ftp.jsp
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://www.ncei.noaa.gov/stormevents/
+      datasets_written:
+      - storm_events
+  - id: noaa_access_data
+    name: NOAA NCEI — Access Data Service (bulk/filtered)
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://www.ncei.noaa.gov/access/services/data/v1
+    api_url: null
+    docs: null
+    auth:
+      type: none
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: null
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: daily_summaries
+      method: GET
+      url_template: ?dataset=daily-summaries&stations={station_ids}&startDate={YYYY-MM-DD}&endDate={YYYY-MM-DD}&format=json
+      example: https://www.ncei.noaa.gov/access/services/data/v1?dataset=daily-summaries&stations=USW00024131&startDate=2024-01-01&endDate=2024-12-31&format=json
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://www.ncei.noaa.gov/support/access-data-service-api-user-documentation
+  - id: noaa_cdo_v2
+    name: NOAA NCEI — Climate Data Online API
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://www.ncei.noaa.gov/cdo-web/api/v2
+    api_url: null
+    docs: null
+    auth:
+      type: token
+      in: header
+      header: token
+      env: NOAA_CDO_TOKEN
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: null
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: dataset_list
+      method: GET
+      url_template: /datasets
+      example: https://www.ncei.noaa.gov/cdo-web/api/v2/datasets
+    example_request: null
+    notes: For bulk/time-sliced pulls, prefer Access Data Service below.
+    extra:
+      enabled: true
+      docs_url: https://www.ncei.noaa.gov/cdo-web/webservices/getstarted
+  - id: nrel_pvwatts
+    name: NREL PVWatts v8
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://developer.nrel.gov/api/pvwatts/v8
+    api_url: null
+    docs: null
+    auth:
+      type: query
+      param: api_key
+      env: NREL_API_KEY
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: On demand
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: estimate
+      method: GET
+      url_template: ?lat={lat}&lon={lon}&system_capacity={kw}&azimuth=180&tilt={tilt}&array_type=1&module_type=1&losses=14
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://developer.nrel.gov/docs/solar/pvwatts/v8/
+      datasets_written:
+      - pv_potential
+  - id: nsf_awards
+    name: NSF Awards API
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://api.nsf.gov/services/v1
+    api_url: null
+    docs: null
+    auth:
+      type: none
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: Daily
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: awards
+      method: GET
+      url_template: /awards.json?keyword={keyword}&startDateStart={start}&startDateEnd={end}
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://www.research.gov/common/webapi/awardapisearch-v1.htm
+      datasets_written:
+      - nsf_awards
+  - id: fra_rail_lines_ntad
+    name: NTAD North American Rail Network (lines)
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://geodata.bts.gov
+    api_url: null
+    docs: null
+    auth:
+      type: none
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: Annual
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: feature_layer
+      method: GET
+      url_template: /datasets/usdot::north-american-rail-network-lines/FeatureServer/0/query?where=1%3D1&outFields=*&f=json
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://geodata.bts.gov/datasets/usdot::north-american-rail-network-lines/about
+      datasets_written:
+      - rail_lines
+  - id: openaddresses
+    name: OpenAddresses (batch jobs & downloads)
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://batch.openaddresses.io
+    api_url: null
+    docs: null
+    auth:
+      type: none
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: Irregular
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: create_job
+      method: POST
+      url_template: /jobs
+    - name: job_status
+      method: GET
+      url_template: /jobs/{job_id}
+    example_request: null
+    notes: null
+    extra:
+      enabled: false
+      docs_url: https://batch.openaddresses.io/docs/
+      datasets_written:
+      - addresses
+  - id: openei_urdb
+    name: OpenEI — Utility Rate Database API
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://api.openei.org/utility_rates
+    api_url: null
+    docs: null
+    auth:
+      type: api_key
+      in: query
+      param: api_key
+      env: OPEN_EI_API_KEY
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: null
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: get_rates
+      method: GET
+      url_template: ?version=5&format=json_plain&detail=full&ratesforutility={utility_name}
+      example: https://api.openei.org/utility_rates?version=5&format=json_plain&detail=full&ratesforutility=Idaho%20Power%20Co&api_key={KEY}
+    example_request: null
+    notes: null
+    extra:
+      enabled: false
+      docs_url: https://openei.org/services/doc/rest/util_rates/
+  - id: openrouteservice
+    name: OpenRouteService — Isochrones (hosted)
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://api.openrouteservice.org
+    api_url: null
+    docs: null
+    auth:
+      type: api_key
+      in: header
+      header: Authorization
+      scheme: Bearer
+      env: ORS_API_KEY
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: null
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: isochrones
+      method: POST
+      url_template: /v2/isochrones/{profile}
+      example: 'POST https://api.openrouteservice.org/v2/isochrones/driving-car
+
+        header: Authorization: Bearer {KEY}
+
+        body: {"locations":[[-116.214,43.618]],"range":[900]}
+
+        '
+    example_request: null
+    notes: null
+    extra:
+      enabled: false
+      docs_url: https://giscience.github.io/openrouteservice/api-reference/endpoints/isochrones/
+  - id: osm_nominatim
+    name: OpenStreetMap Nominatim (geocoding)
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://nominatim.openstreetmap.org
+    api_url: null
+    docs: null
+    auth:
+      type: none
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: On demand
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: search
+      method: GET
+      url_template: /search?q={query}&format=json&addressdetails=1&limit=10&email={contact_email}
+    - name: reverse
+      method: GET
+      url_template: /reverse?lat={lat}&lon={lon}&format=json&zoom=18&addressdetails=1&email={contact_email}
+    example_request: null
+    notes: null
+    extra:
+      enabled: false
+      docs_url: https://nominatim.org/release-docs/develop/api/Overview/
+      rate_limits: 'Public instance: strict usage policy, identify with email/User-Agent; prefer self-hosted.'
+      datasets_written:
+      - geocode_osm
+  - id: osm_overpass
+    name: OpenStreetMap — Overpass API
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://overpass-api.de/api/interpreter
+    api_url: null
+    docs: null
+    auth:
+      type: none
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: null
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: ql_post
+      method: POST
+      url_template: ''
+      example: 'POST https://overpass-api.de/api/interpreter
+
+        body: [out:json][timeout:180];node["amenity"="supermarket"](bbox);out center;
+
+        '
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://wiki.openstreetmap.org/wiki/Overpass_API
+      rate_limits: Community resource; keep <10k queries/day and <1GB/day.
+      datasets_written:
+      - osm_pois
+      - osm_bikeways
+  - id: osrm
+    name: OSRM HTTP API (self/hosted)
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://{your_osrm_host}
+    api_url: null
+    docs: null
+    auth:
+      type: none
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: null
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: route
+      method: GET
+      url_template: /route/v1/{profile}/{lon1},{lat1};{lon2},{lat2}?overview=full&annotations=duration,distance
+      example: http://localhost:5000/route/v1/driving/-116.214,43.618;-116.203,43.602?overview=false
+    - name: table
+      method: GET
+      url_template: /table/v1/{profile}/{coords}?annotations=duration,distance
+      example: http://localhost:5000/table/v1/driving/-116.214,43.618;-116.203,43.602;-116.201,43.600
+    example_request: null
+    notes: Isochrones require Valhalla or computed fan-out; OSRM has no native isochrone endpoint.
+    extra:
+      enabled: true
+      docs_url: https://project-osrm.org/docs/v5.24.0/api/
+  - id: phmsa_npms
+    name: PHMSA National Pipeline Mapping System (FeatureServer)
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://services.arcgis.com/G4S1dGvn7PIgYd6Y/arcgis/rest/services
+    api_url: null
+    docs: null
+    auth:
+      type: none
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: Annual
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: pipelines_features
+      method: GET
+      url_template: /NPMS_Pipelines_2022/FeatureServer/0/query?where=1%3D1&outFields=*&f=json
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://www.phmsa.dot.gov/data-and-statistics/pipeline/data-visualization-overview
+      datasets_written:
+      - pipelines
+  - id: ridb_recreation
+    name: Recreation.gov RIDB API
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://ridb.recreation.gov/api/v1
+    api_url: null
+    docs: null
+    auth:
+      type: header
+      header: apikey
+      env: RIDB_API_KEY
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: Weekly
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: facilities
+      method: GET
+      url_template: /facilities?state={state_abbr}&limit=50&offset={offset}
+    - name: activities
+      method: GET
+      url_template: /activities
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://ridb.recreation.gov/docs
+      datasets_written:
+      - rec_facilities
+  - id: redfin_datacenter
+    name: Redfin Data Center (market trends) — CSV/TSV
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://redfin-public-data.s3-us-west-2.amazonaws.com
+    api_url: null
+    docs: null
+    auth:
+      type: none
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: null
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: zip_market_tracker
+      method: GET
+      url_template: /redfin_market_tracker/zip_code_market_tracker.tsv000.gz
+      example: https://redfin-public-data.s3-us-west-2.amazonaws.com/redfin_market_tracker/zip_code_market_tracker.tsv000.gz
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://www.redfin.com/news/data-center/
+  - id: sbir_awards
+    name: SBIR/STTR Awards API
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://www.sbir.gov/api/awards.json
+    api_url: null
+    docs: null
+    auth:
+      type: none
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: Weekly
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: awards
+      method: GET
+      url_template: ?q={query}&start={offset}
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://www.sbir.gov/sbirsearch/award/all
+      datasets_written:
+      - sbir_sttr_awards
+  - id: socrata_soda
+    name: Socrata SODA — city/county open data (permits/zoning)
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://{domain}/resource/{dataset_id}.json
+    api_url: null
+    docs: null
+    auth:
+      type: app_token_optional
+      in: header
+      header: X-App-Token
+      env: SOCRATA_APP_TOKEN
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: null
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: generic_query
+      method: GET
+      url_template: ?$select=*&$limit=50000&$where={predicate}
+      example: https://data.denvergov.org/resource/permits.json?$limit=50000
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://dev.socrata.com/consumers/getting-started.html
+  - id: transitland_v2
+    name: Transitland v2 (REST)
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://transit.land/api/v2/rest
+    api_url: null
+    docs: null
+    auth:
+      type: api_key
+      in: header_or_query
+      header: apikey
+      param: apikey
+      env: TRANSITLAND_API_KEY
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: When GTFS updates
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: feeds_search
+      method: GET
+      url_template: /feeds?bbox={minx},{miny},{maxx},{maxy}
+      example: https://transit.land/api/v2/rest/feeds?bbox=-112.5,39.0,-111.5,40.0
+    example_request: null
+    notes: null
+    extra:
+      enabled: false
+      docs_url: https://www.transit.land/documentation/rest-api/
+      datasets_written:
+      - gtfs_feeds
+      - gtfs_stops
+      - gtfs_routes
+  - id: census_acs
+    name: U.S. Census — American Community Survey (ACS 5-year)
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://api.census.gov/data/{year}/acs/acs5
+    api_url: null
+    docs: null
+    auth:
+      type: api_key_optional
+      in: query
+      param: key
+      env: CENSUS_API_KEY
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: Annual; new vintages each fall.
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: table_query
+      method: GET
+      url_template: ?get={vars}&for={geo}:{geo_id}
+      example: https://api.census.gov/data/2023/acs/acs5?get=NAME,B01001_001E&for=metropolitan%20statistical%20area/micropolitan%20statistical%20area:*
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://api.census.gov/data/{year}/acs/acs5.html
+      rate_limits: Soft throttle; add key for higher quotas.
+      datasets_written:
+      - acs_income
+      - acs_education
+      - acs_commute
+      - acs_households
+  - id: college_scorecard
+    name: U.S. Dept. of Education College Scorecard API
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://api.data.gov/ed/collegescorecard/v1/schools
+    api_url: null
+    docs: null
+    auth:
+      type: query
+      param: api_key
+      env: ED_API_KEY
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: Annual
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: schools
+      method: GET
+      url_template: .json?fields=id,school.name,school.state,location.lat,location.lon,latest.student.size&per_page=100&page={page}
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://collegescorecard.ed.gov/data/documentation/
+      datasets_written:
+      - higher_ed_schools
+  - id: us_drought_monitor
+    name: U.S. Drought Monitor (ArcGIS)
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://mapservice.nationaldroughtmitigationcenter.org/arcgis/rest/services/usdm_services/USDM
+    api_url: null
+    docs: null
+    auth:
+      type: none
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: Weekly
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: mapserver_query
+      method: GET
+      url_template: /MapServer/0/query?where=ValidStart%20%3E%3D%20DATE%20%27{start}%27&outFields=*&f=json
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://droughtmonitor.unl.edu/DmData/DataServices.aspx
+      datasets_written:
+      - drought_monitor
+  - id: census_geocoder
+    name: US Census Geocoder API
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://geocoding.geo.census.gov/geocoder
+    api_url: null
+    docs: null
+    auth:
+      type: none
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: On demand
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: single_line
+      method: GET
+      url_template: /locations/onelineaddress?address={address}&benchmark=Public_AR_Current&format=json
+    - name: reverse
+      method: GET
+      url_template: /locations/coordinates?x={lon}&y={lat}&benchmark=Public_AR_Current&format=json
+    - name: batch
+      method: POST
+      url_template: /geographies/addressesbatch?benchmark=Public_AR_Current&vintage=Current_Census&format=json
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://geocoding.geo.census.gov/geocoder/Geocoding_Services_API.html
+      rate_limits: None published; fair-use expected.
+      datasets_written:
+      - geocode_census
+  - id: census_tigerweb
+    name: US Census TIGERweb (boundaries via ArcGIS)
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb
+    api_url: null
+    docs: null
+    auth:
+      type: none
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: Annual (updated after each decennial/ACS vintages)
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: states
+      method: GET
+      url_template: /State_TIGERweb/MapServer/28/query?where=1%3D1&outFields=*&f=json
+    - name: counties
+      method: GET
+      url_template: /Counties_Cartographic/MapServer/2/query?where=1%3D1&outFields=*&f=json
+    - name: tracts
+      method: GET
+      url_template: /Tracts_Blocks/MapServer/2/query?where=STATE%3D%27{state_fips}%27&outFields=*&f=json
+    - name: places
+      method: GET
+      url_template: /Places_CouSub/MapServer/0/query?where=STATE%3D%27{state_fips}%27&outFields=*&f=json
+    - name: zcta5
+      method: GET
+      url_template: /ZCTA5/MapServer/0/query?where=1%3D1&outFields=*&f=json
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://tigerweb.geo.census.gov/arcgis/rest/services
+      datasets_written:
+      - boundaries_state
+      - boundaries_county
+      - boundaries_tract
+      - boundaries_place
+      - boundaries_zcta
+  - id: bts_noise
+    name: USDOT/BTS National Transportation Noise Map (ArcGIS)
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://data-usdot.opendata.arcgis.com
+    api_url: null
+    docs: null
+    auth:
+      type: none
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: null
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: tiles_or_layer
+      method: GET
+      url_template: https://www.arcgis.com/sharing/rest/content/items/29d9fc21fce543c7a841664945263e00/data
+      example: Download layer JSON or add as Feature/Map service item in ArcGIS clients
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://www.bts.gov/geospatial/national-transportation-noise-map
+  - id: usfs_trails
+    name: USFS National Forest System Trails (ArcGIS)
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://data-usfs.hub.arcgis.com
+    api_url: null
+    docs: null
+    auth:
+      type: none
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: Quarterly
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: trails_features
+      method: GET
+      url_template: /datasets/usfs::national-forest-system-trails-feature-layer/FeatureServer/0/query?where=1%3D1&outFields=*&f=json
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://data-usfs.hub.arcgis.com/datasets/usfs::national-forest-system-trails-feature-layer/about
+      datasets_written:
+      - trails
+  - id: usfs_wildfire_risk
+    name: USFS Wildfire Risk to Communities (ArcGIS)
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://data-usfs.hub.arcgis.com
+    api_url: null
+    docs: null
+    auth:
+      type: none
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: Annual
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: risk_to_homes_image
+      method: GET
+      url_template: /datasets/usfs::wildfire-risk-to-communities-risk-to-potential-structures-image-service
+    - name: burn_probability
+      method: GET
+      url_template: /datasets/d93720867d1a4aa69f4a15dbf3ddeaea
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://wildfirerisk.org/download/
+      datasets_written:
+      - wildfire_risk_layers
+  - id: usfws_nwi
+    name: USFWS National Wetlands Inventory (WMS/WFS)
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://www.fws.gov/wetlands/arcgis/services/Wetlands/MapServer/WMSServer
+    api_url: null
+    docs: null
+    auth:
+      type: none
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: null
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: wms_getmap
+      method: GET
+      url_template: ?service=WMS&request=GetMap&bbox={bbox}&layers=1&crs=EPSG:3857&format=image/png&width=1024&height=1024
+      example: https://www.fws.gov/wetlands/arcgis/services/Wetlands/MapServer/WMSServer?service=WMS&request=GetMap&layers=1&bbox=-12948628,4844840,-12895344,4898144&crs=EPSG:3857&width=1024&height=1024&format=image/png
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://www.fws.gov/program/national-wetlands-inventory/web-mapping-services
+  - id: usgs_epqs
+    name: USGS Elevation Point Query Service (EPQS)
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://apps.nationalmap.gov/epqs/pqs.php
+    api_url: null
+    docs: null
+    auth:
+      type: none
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: null
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: point
+      method: GET
+      url_template: ?x={lon}&y={lat}&units={meters|feet}&output=json
+      example: https://apps.nationalmap.gov/epqs/pqs.php?x=-116.214&y=43.618&units=meters&output=json
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://apps.nationalmap.gov/epqs/
+  - id: usgs_nhdplus_hr
+    name: USGS NHDPlus High Resolution (ArcGIS REST)
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://hydro.nationalmap.gov/arcgis/rest/services/NHDPlus_HR/MapServer
+    api_url: null
+    docs: null
+    auth:
+      type: none
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: null
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: layer_query
+      method: GET
+      url_template: /{layer_id}/query?where=1=1&f=geojson&outFields=*
+      example: https://hydro.nationalmap.gov/arcgis/rest/services/NHDPlus_HR/MapServer/4/query?where=1=1&f=geojson&outFields=*
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://www.usgs.gov/national-hydrography/access-national-hydrography-products
+  - id: pad_us
+    name: USGS PAD-US (Protected Areas)
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://services1.arcgis.com
+    api_url: null
+    docs: null
+    auth:
+      type: none
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: null
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: example_feature_service
+      method: GET
+      url_template: https://services1.arcgis.com/YourItem/arcgis/rest/services/PADUS2_1/FeatureServer/0/query?where=1=1&f=geojson&outFields=*
+      example: Replace YourItem with PAD-US item id from USGS catalog
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://www.usgs.gov/programs/gap-analysis-project/science/pad-us-data-download
+  - id: usgs_seismic_designmaps
+    name: USGS Seismic Design Maps Web Services
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://earthquake.usgs.gov/ws/designmaps
+    api_url: null
+    docs: null
+    auth:
+      type: none
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: null
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: asce7_22
+      method: GET
+      url_template: /asce7-22.json?latitude={lat}&longitude={lon}&riskCategory=II&siteClass={D}&title=site
+      example: https://earthquake.usgs.gov/ws/designmaps/asce7-22.json?latitude=43.618&longitude=-116.214&riskCategory=II&siteClass=D&title=Boise
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://earthquake.usgs.gov/ws/designmaps/
+  - id: tnm_access
+    name: USGS The National Map — TNM Access API
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://tnmaccess.nationalmap.gov/api/v1
+    api_url: null
+    docs: null
+    auth:
+      type: none
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: null
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: products_search
+      method: GET
+      url_template: /products?datasets={dataset}&bbox={minx},{miny},{maxx},{maxy}
+      example: https://tnmaccess.nationalmap.gov/api/v1/products?datasets=3DEPElevation&bbox=-116.5,43.4,-116.0,43.8
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://tnmaccess.nationalmap.gov/api/v1/docs
+  - id: usgs_nwis
+    name: USGS Water Services (NWIS)
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://waterservices.usgs.gov
+    api_url: null
+    docs: null
+    auth:
+      type: none
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: Hourly
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: instantaneous_values
+      method: GET
+      url_template: /nwis/iv/?sites={site_ids}&parameterCd=00060,00065&format=json
+    - name: site_info
+      method: GET
+      url_template: /nwis/site/?format=rdb&huc={huc}
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://waterservices.usgs.gov/
+      datasets_written:
+      - streamflow_iv
+      - gauge_sites
+  - id: patentsview
+    name: USPTO PatentsView API
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://api.patentsview.org
+    api_url: null
+    docs: null
+    auth:
+      type: none
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: Weekly
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: patents_query
+      method: GET
+      url_template: /patents/query?q={query}&f={fields}&o={options}
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://patentsview.org/apis/api-endpoints
+      datasets_written:
+      - patents
+  - id: utah_water_arcgis
+    name: Utah Water Resources / Rights — ArcGIS Feature Services
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://services1.arcgis.com/99lidPhWCzftIe9K/ArcGIS/rest/services
+    api_url: null
+    docs: null
+    auth:
+      type: none
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: null
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: water_related_land_use
+      method: GET
+      url_template: /WaterRelatedLandUse/FeatureServer/0/query?where=1=1&f=geojson&outFields=*
+      example: https://services1.arcgis.com/99lidPhWCzftIe9K/ArcGIS/rest/services/WaterRelatedLandUse/FeatureServer/0/query?where=1=1&f=geojson&outFields=*
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://dwre-utahdnr.opendata.arcgis.com/
+  - id: valhalla
+    name: Valhalla (self/hosted) — Isochrone/Matrix
+    category: sources
+    subcategory: null
+    type: null
+    base_url: http://{your_valhalla_host}:8002
+    api_url: null
+    docs: null
+    auth:
+      type: none
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: null
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: isochrone
+      method: POST
+      url_template: /isochrone
+      example: 'POST http://localhost:8002/isochrone
+
+        body: {"locations":[{"lat":43.618,"lon":-116.214}],"costing":"auto","contours":[{"time":15}]}
+
+        '
+    - name: matrix
+      method: POST
+      url_template: /matrix
+      example: 'POST http://localhost:8002/matrix
+
+        body: {"sources":[{"lat":43.618,"lon":-116.214}],"targets":[{"lat":43.602,"lon":-116.203}],"costing":"auto"}
+
+        '
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://valhalla.github.io/valhalla/api/
+  - id: yelp_places
+    name: Yelp Places API (reviews/reputation) — licensed
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://api.yelp.com/v3
+    api_url: null
+    docs: null
+    auth:
+      type: bearer
+      in: header
+      header: Authorization
+      scheme: Bearer
+      env: YELP_API_KEY
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: null
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: business_search
+      method: GET
+      url_template: /businesses/search?latitude={lat}&longitude={lon}&categories={cats}&limit=50
+      example: https://api.yelp.com/v3/businesses/search?latitude=43.618&longitude=-116.214&categories=restaurants&limit=50
+    example_request: null
+    notes: null
+    extra:
+      enabled: false
+      docs_url: https://docs.developer.yelp.com/docs/places-intro
+  - id: zillow_research
+    name: Zillow Research downloads (ZHVI/ZORI) — CSV
+    category: sources
+    subcategory: null
+    type: null
+    base_url: https://www.zillow.com/research/data/
+    api_url: null
+    docs: null
+    auth:
+      type: none
+    rate_limit: null
+    format: null
+    coverage: null
+    update_freq: null
+    tags: null
+    owner: null
+    license: null
+    access: null
+    endpoints:
+    - name: zori_city_csv
+      method: GET
+      url_template: https://files.zillowstatic.com/research/public_csvs/zori/City_zori_uc_sfr_tier_0.33_0.67_sm_sa_month.csv
+      example: https://files.zillowstatic.com/research/public_csvs/zori/City_zori_uc_sfr_tier_0.33_0.67_sm_sa_month.csv
+    example_request: null
+    notes: null
+    extra:
+      enabled: true
+      docs_url: https://www.zillow.com/research/data/

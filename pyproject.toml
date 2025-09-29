@@ -1,9 +1,17 @@
 [project]
-name = "yourpkg"
+name = "WestHousingModel"
 version = "0.1.0"
-description = "Replace me in scripts/init.sh"
+description = "WestHousingModel"
 readme = "README.md"
 requires-python = ">=3.12"
+dependencies = [
+    "pandas>=2.1",
+    "pandera>=0.17",
+    "pyarrow>=14.0",
+]
+
+[project.scripts]
+west-housing-model = "west_housing_model.cli.main:main"
 
 [tool.black]
 line-length = 100
@@ -11,8 +19,28 @@ line-length = 100
 [tool.ruff]
 line-length = 100
 target-version = "py312"
+
+[tool.ruff.lint]
 extend-select = ["I"]
 
 [tool.mypy]
 python_version = "3.12"
 strict = true
+
+[[tool.mypy.overrides]]
+module = [
+    "pandas",
+    "pandas.*",
+    "requests",
+]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[[tool.mypy.overrides]]
+module = [
+    "west_housing_model.*",
+]
+ignore_missing_imports = true

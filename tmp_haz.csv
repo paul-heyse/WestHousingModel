@@ -1,0 +1,2 @@
+property_id,hazard_type,value,flag,as_of,source_id
+p1,in_sfha,,True,2025-01-01,fema_nfhl
