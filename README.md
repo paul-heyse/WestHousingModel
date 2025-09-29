@@ -11,6 +11,33 @@ Baseline template for Python projects in Cursor on Ubuntu.
 
 See `.cursor/rules`, `.vscode/*`, and `environment.yml` for configuration details.
 
+## Testing
+
+```bash
+# Run unit + integration tests
+pytest -q
+
+# Lint and style
+ruff check src tests
+black .
+
+# Validate OpenSpec changes (if any)
+openspec validate --strict
+```
+
+## Running the UI
+
+```bash
+streamlit run -m west_housing_model.ui.app
+```
+
+Pages:
+
+- Explore: table with basic Aker Fit filter
+- Evaluate: minimal valuation, provenance captions, cached evaluation + timing
+- Scenarios: save/load scenario JSON (session) and export CSV with manifest
+- Settings: registry dictionary (read-only) and pillar weights
+
 ## Data Access & Caching
 
 - Connectors registered with `west_housing_model.data.connectors.register_connector` are fronted by the `Repository`
@@ -42,3 +69,9 @@ Notes:
 
 - Weights are normalized at runtime if they don’t sum to 1.0.
 - Leave variables unset to use defaults. You can set them in your shell or via `.env`/direnv.
+
+## Governance
+
+- Feature Dictionary: see `docs/feature_dictionary.md` for columns, sources, units, and provenance.
+- Rulebook: see `docs/rulebook.md` for scoring and valuation formulas, thresholds, and override policy.
+- Architecture Decision Records (ADRs): see `docs/adr/` for decisions and rationale; start with `ADR-0001` (Logging/Observability) and `ADR-0002` (Testing Strategy).

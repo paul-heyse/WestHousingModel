@@ -343,7 +343,7 @@ Defaults: `w_yoc=0.45, w_irr=0.35, w_dscr=0.20`.
 #### 6.5.4 Quick Income Approach & DCF
 
 * **Income approach**: stabilized NOI / cap rate (band) → **value range**.
-* **DCF (10‑yr)**: NOI projection with rent growth and OpEx adjustments; reversion using **exit cap**; simple financing (interest‑only toggle or amortizing).
+* **DCF (10‑yr)**: NOI projected annually with a constant growth rate and **terminal value at year 10** using an **exit cap**; cash flows discounted at a configurable **discount rate**. Defaults are provided in settings/overrides and surfaced via CLI render.
 * **Sensitivity** tiles: rent ±5%, cap ±50 bps, insurance ±20% → 9‑cell grid, displayed and exported.
 
 ---

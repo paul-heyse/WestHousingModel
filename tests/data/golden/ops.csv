@@ -1,0 +1,2 @@
+property_id,as_of,eia_state,eia_res_price_cents_per_kwh,broadband_gbps_flag,zoning_context_note
+s-1,2025-02-01,CO,13.5,True,MF allowed

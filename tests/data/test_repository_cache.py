@@ -8,6 +8,7 @@ from pathlib import Path
 
 import pandas as pd
 import pytest
+
 from west_housing_model.core.exceptions import ConnectorError, SchemaError
 from west_housing_model.data.connectors import callable_connector
 from west_housing_model.data.repository import (

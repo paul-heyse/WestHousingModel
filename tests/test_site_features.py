@@ -1,4 +1,5 @@
 import pandas as pd
+
 from west_housing_model.features.site_features import (
     build_site_features_from_components,
     extract_provenance,
@@ -17,7 +18,7 @@ def test_build_site_features_from_components_happy_path():
 
     hazards = pd.DataFrame(
         {
-            "property_id": ["p1", "p1", "p1", "p1", "p1", "p1"],
+            "property_id": ["p1"] * 9,
             "hazard_type": [
                 "in_sfha",
                 "wildfire_risk_percentile",
@@ -25,10 +26,13 @@ def test_build_site_features_from_components_happy_path():
                 "hdd_annual",
                 "cdd_annual",
                 "rail_within_300m_flag",
+                "winter_storms_10yr_county",
+                "minutes_to_trailhead",
+                "broadband_gbps_flag",
             ],
-            "value": [None, 87, 0.18, 6200, 900, None],
-            "flag": [True, None, None, None, None, True],
-            "as_of": [pd.Timestamp("2025-01-01")] * 6,
+            "value": [None, 87, 0.18, 6200, 900, None, 5, 18.5, None],
+            "flag": [True, None, None, None, None, True, None, None, True],
+            "as_of": [pd.Timestamp("2025-01-01")] * 9,
             "source_id": [
                 "fema_nfhl",
                 "usfs_wildfire_risk",
@@ -36,6 +40,9 @@ def test_build_site_features_from_components_happy_path():
                 "noaa_normals",
                 "noaa_normals",
                 "pipelines_prox",
+                "connector.noaa_storm_events",
+                "connector.usfs_trails",
+                "connector.fcc_bdc",
             ],
         }
     )
@@ -56,6 +63,9 @@ def test_build_site_features_from_components_happy_path():
         "hdd_annual",
         "cdd_annual",
         "rail_within_300m_flag",
+        "winter_storms_10yr_county",
+        "minutes_to_trailhead",
+        "broadband_gbps_flag",
     ]:
         assert col in out.columns
 
@@ -67,6 +77,9 @@ def test_build_site_features_from_components_happy_path():
     assert out.loc[0, "hdd_annual"] == 6200
     assert out.loc[0, "cdd_annual"] == 900
     assert out.loc[0, "rail_within_300m_flag"] is True
+    assert out.loc[0, "winter_storms_10yr_county"] == 5
+    assert out.loc[0, "minutes_to_trailhead"] == 18.5
+    assert out.loc[0, "broadband_gbps_flag"] is True
 
 
 def test_extract_provenance_sidecar_fields():

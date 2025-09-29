@@ -1,0 +1,10 @@
+property_id,hazard_type,value,flag,as_of,source_id
+s-1,in_sfha,,False,2025-02-01,connector.fema
+s-1,wildfire_risk_percentile,82,,2025-02-01,connector.usfs_wildfire
+s-1,pga_10in50_g,0.18,,2025-02-01,connector.usgs_designmaps
+s-1,winter_storms_10yr_county,12,,2025-02-01,connector.noaa_storms
+s-1,hdd_annual,6000,,2025-02-01,connector.noaa_normals
+s-1,cdd_annual,900,,2025-02-01,connector.noaa_normals
+s-1,rail_within_300m_flag,,True,2025-02-01,connector.transport
+s-1,broadband_gbps_flag,,True,2025-02-01,connector.fcc
+s-1,minutes_to_trailhead,20,,2025-02-01,connector.osm

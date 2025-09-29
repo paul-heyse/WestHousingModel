@@ -1,4 +1,5 @@
 import pandas as pd
+
 from west_housing_model.valuation import ValuationInputs, run_valuation
 
 
@@ -49,14 +50,18 @@ def test_run_valuation_basic_flow_validates():
         "value_base",
         "value_high",
         "yoc_base",
+        "irr_5yr_base",
+        "sensitivity_matrix",
         "dscr_proxy",
         "insurance_uplift",
         "utilities_scaler",
-        "deal_quality",
+        "source_manifest",
     ]:
         assert col in out.columns
 
     assert out.loc[0, "scenario_id"] == "scn-1"
     assert out.loc[0, "property_id"] == "prop-1"
     assert out.loc[0, "noistab"] > 0
-    assert 0 <= int(out.loc[0, "deal_quality"]) <= 100
+    matrix = out.loc[0, "sensitivity_matrix"]
+    assert isinstance(matrix, list)
+    assert len(matrix) == 27

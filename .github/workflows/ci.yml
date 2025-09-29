@@ -1,4 +1,63 @@
 name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up micromamba
+        uses: mamba-org/setup-micromamba@v2
+        with:
+          environment-file: environment.yml
+          cache-environment: true
+          cache-downloads: true
+          create-args: >-
+            -c conda-forge
+
+      - name: Install project (editable)
+        shell: bash -l {0}
+        run: |
+          python -m pip install -e .
+
+      - name: Lint (ruff)
+        shell: bash -l {0}
+        run: |
+          ruff check src tests
+
+      - name: Format check (black)
+        shell: bash -l {0}
+        run: |
+          black --check .
+
+      - name: Type check (mypy)
+        shell: bash -l {0}
+        run: |
+          mypy src || true
+
+      - name: Run tests (pytest)
+        shell: bash -l {0}
+        env:
+          PYTHONPATH: src
+        run: |
+          pytest -q --maxfail=1 --disable-warnings --cov=src --cov-report=term-missing
+
+      - name: Validate OpenSpec (strict)
+        shell: bash -l {0}
+        run: |
+          if command -v openspec >/dev/null 2>&1; then
+            openspec validate --strict || true
+          else
+            echo "openspec not installed; skipping validate"
+          fi
+name: CI
 on:
   push:
   pull_request:

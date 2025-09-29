@@ -1,0 +1,2 @@
+place_id,geo_level,geo_code,name,source_id,public_land_acres_30min,broadband_gbps_flag
+p-1,msa,12345,Test Place,connector.place_context,950,True

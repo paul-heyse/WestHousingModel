@@ -1,8 +1,12 @@
 from __future__ import annotations
 
 from datetime import datetime
+from pathlib import Path
 
 import pandas as pd
+
+import pytest
+
 from west_housing_model.data.connectors import make_census_acs_connector
 from west_housing_model.data.repository import (
     STATUS_FRESH,
@@ -67,3 +71,19 @@ def test_census_acs_registry_defaults_used() -> None:
     result = repo.get(connector.source_id, state="08", county="005")
     df = pd.DataFrame(result.frame)
     assert df.loc[0, "geo_level"] == "tract"
+
+
+def test_census_acs_schema_failure_captures_payload(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("WEST_HOUSING_MODEL_FAILURE_CACHE", str(tmp_path / "failures"))
+
+    def bad_payload(**_: object) -> list[dict[str, object]]:
+        return [{"unexpected": 1}]
+
+    connector = make_census_acs_connector(fetch_override=bad_payload)
+    repo = Repository(connectors={connector.source_id: connector})
+
+    with pytest.raises(Exception):
+        repo.get(connector.source_id, state="08", county="005")
+
+    failure_files = list((tmp_path / "failures" / connector.source_id).glob("*.csv"))
+    assert failure_files, "Schema failures should capture a snapshot payload"

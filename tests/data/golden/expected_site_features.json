@@ -1,0 +1,19 @@
+[
+  {
+    "property_id": "s-1",
+    "place_id": "p-1",
+    "latitude": 39.7,
+    "longitude": -104.9,
+    "source_id": "site.features",
+    "in_sfha": false,
+    "wildfire_risk_percentile": 82,
+    "pga_10in50_g": 0.18,
+    "winter_storms_10yr_county": 12,
+    "minutes_to_trailhead": 20.0,
+    "hdd_annual": 6000.0,
+    "cdd_annual": 900.0,
+    "rail_within_300m_flag": true,
+    "broadband_gbps_flag": true,
+    "as_of": "2025-02-01"
+  }
+]

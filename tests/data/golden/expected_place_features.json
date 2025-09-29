@@ -1,0 +1,17 @@
+[
+  {
+    "place_id": "p-1",
+    "geo_level": "msa",
+    "geo_code": "12345",
+    "name": "Test Place",
+    "source_id": "connector.place_context",
+    "public_land_acres_30min": 950.0,
+    "broadband_gbps_flag": true,
+    "pillar_uc": 0.8,
+    "pillar_oa": 0.5,
+    "pillar_ij": 1.0,
+    "pillar_sc": 0.6666666667,
+    "aker_market_fit": 74,
+    "as_of": "2025-01-01"
+  }
+]

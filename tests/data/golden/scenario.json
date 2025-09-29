@@ -1,0 +1,40 @@
+{
+  "scenario_id": "scn-001",
+  "property_id": "s-1",
+  "as_of": "2025-03-01",
+  "place_features": {
+    "aker_market_fit": 74,
+    "msa_jobs_t12": 2.4,
+    "permits_5plus_per_1k_hh_t12": 40,
+    "source_id": "connector.place_context",
+    "as_of": "2025-01-01"
+  },
+  "site_features": {
+    "in_sfha": false,
+    "wildfire_risk_percentile": 82,
+    "pga_10in50_g": 0.18,
+    "winter_storms_10yr_county": 12,
+    "hdd_annual": 6000,
+    "cdd_annual": 900,
+    "source_id": "site.features",
+    "as_of": "2025-02-01"
+  },
+  "ops_features": {
+    "utility_rate_note": "Utilities (CO RES): 13.5 c/kWh",
+    "broadband_gbps_flag": true,
+    "source_id": "ops.features",
+    "as_of": "2025-02-01"
+  },
+  "user_overrides": {
+    "units": 24,
+    "rent_baseline": 1800,
+    "base_opex_per_unit_year": 3200,
+    "total_cost": 3500000,
+    "cap_low": 0.06,
+    "cap_base": 0.065,
+    "cap_high": 0.07,
+    "g_base": 0.025,
+    "rent_to_income": 0.28,
+    "affordability_overridden": false
+  }
+}
